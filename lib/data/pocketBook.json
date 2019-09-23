@@ -1,0 +1,27 @@
+[
+  {
+    "date":"9月16日",
+    "income":15.0,
+    "expenditure":0.0,
+    "record":[
+      {
+        "type":2,
+        "date":"9月16日",
+        "money":5.0,
+        "name":"三餐"
+      },
+      {
+        "type":2,
+        "date":"9月16日",
+        "money":5.0,
+        "name":"三餐"
+      },
+      {
+        "type":2,
+        "date":"9月16日",
+        "money":5.0,
+        "name":"三餐"
+      }
+    ]
+  }
+]

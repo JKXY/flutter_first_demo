@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../ui/theme_page.dart';
 import '../ui/webview_page.dart';
+import '../ui/pocket_book_page.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -124,12 +125,19 @@ class MainPageState extends State<MainPage> {
       crossAxisCount: 4,
       childAspectRatio: 1.0,
       children: <Widget>[
-        Icon(Icons.ac_unit),
+        IconButton(icon: Icon(Icons.attach_money),onPressed: _toPocketBookPage,),
         Icon(Icons.airport_shuttle),
         Icon(Icons.all_inclusive),
         Icon(Icons.beach_access)
       ],
     ));
+  }
+
+  void _toPocketBookPage(){
+    Navigator.of(context)
+        .push(new MaterialPageRoute(builder: (BuildContext context) {
+      return PocaketBookPage();
+    }));
   }
 
   void _pushSaved() {
