@@ -1,3 +1,5 @@
+import 'package:FlutterDemo/bean/pocketBookBean.dart';
+import 'package:FlutterDemo/data/PocketDatabaseHelper.dart';
 import 'package:FlutterDemo/res/fonts/AntdIcons.dart';
 import 'package:FlutterDemo/res/strings.dart';
 import 'package:flutter/cupertino.dart';
@@ -207,8 +209,9 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     }
   }
 
-  var _isInput = false;
+  var db = PocketDatabaseHelper();
 
+  var _isInput = false;
   _numberRowOnClick(int index) {
     switch (index) {
       case 3: //x
@@ -224,6 +227,23 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         _isInput = false;
         break;
       case 11: //再记(注意+)
+        var record = PocketBookRecord();
+        if(_moneyValue.contains('+')){
+          if(_moneyValue.endsWith('+')){
+            _moneyValue = _moneyValue.replaceAll('+', '');
+          }else{
+            var temp = _moneyValue.split('+');
+            var count = double.tryParse(temp[0]) + double.tryParse(temp[1]);
+            _moneyValue = count.toStringAsFixed(2);
+          }
+        }
+        record.money = _moneyValue;
+        record.type = _typeValue;
+        record.name = nameList[currentNameIndex];
+        var time = DateTime.now();
+        var date = "${time.year}.${time.month}.${time.day}";
+        record.date = date;
+        db.saveItem(record);
 
         currentNameIndex = 0;
         _typeValue = 2;
@@ -255,7 +275,24 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         }
         break;
       case 15: //保存(注意+)
-
+        var record = PocketBookRecord();
+        if(_moneyValue.contains('+')){
+          if(_moneyValue.endsWith('+')){
+            _moneyValue = _moneyValue.replaceAll('+', '');
+          }else{
+            var temp = _moneyValue.split('+');
+            var count = double.tryParse(temp[0]) + double.tryParse(temp[1]);
+            _moneyValue = count.toStringAsFixed(2);
+          }
+        }
+        record.money = _moneyValue;
+        record.type = _typeValue;
+        record.name = nameList[currentNameIndex];
+        var time = DateTime.now();
+        var date = "${time.year}.${time.month}.${time.day}";
+        record.date = date;
+        db.saveItem(record);
+        Navigator.of(context).pop(true);
         break;
       default: //数字
         if (_moneyValue.length >= 14) {
@@ -286,5 +323,11 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         break;
     }
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+//    db.close();
   }
 }

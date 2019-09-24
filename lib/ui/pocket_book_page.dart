@@ -1,4 +1,5 @@
 import 'package:FlutterDemo/bean/pocketBookBean.dart';
+import 'package:FlutterDemo/data/PocketDatabaseHelper.dart';
 import 'package:FlutterDemo/res/strings.dart';
 import 'package:FlutterDemo/ui/pocket_book_add_page.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,9 @@ class PocaketBookState extends State<PocaketBookPage> {
   void _toAddPage() {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return PocketBookAddPage();
-    }));
+    })).then((isRefresh) {
+      if (isRefresh) _loadData(0);
+    });
   }
 
   Widget HandleView() {
@@ -65,7 +68,7 @@ class PocaketBookState extends State<PocaketBookPage> {
               Expanded(
                 child: Center(
                     child: Text(
-                  "0.00",
+                  "$allMoney",
                   style: TextStyle(fontSize: 30, color: Colors.red),
                 )),
               )
@@ -75,8 +78,8 @@ class PocaketBookState extends State<PocaketBookPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Center(child: Text(Strings.income)),
-              Center(child: Text(Strings.expenditure))
+              Center(child: Text("${Strings.income}$incomeMoney")),
+              Center(child: Text("${Strings.expenditure}$exMoney"))
             ],
           )
         ],
@@ -97,7 +100,9 @@ class PocaketBookState extends State<PocaketBookPage> {
                     EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 0),
                 child: Row(
                   children: <Widget>[
-                    Expanded(child: new Text(pocketBookList[postion].date)),
+                    Expanded(
+                        child: new Text(
+                            _formatDate(pocketBookList[postion].date))),
                     Text(
                         "收:${pocketBookList[postion].income} 支:${pocketBookList[postion].expenditure}")
                   ],
@@ -111,7 +116,8 @@ class PocaketBookState extends State<PocaketBookPage> {
 
   Widget getRecordListView(List<PocketBookRecord> record) {
     if (record == null || record.length <= 0) {
-      return null;
+//      return null;
+      return Text("没记录");
     } else {
       return ListView.separated(
         padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
@@ -151,17 +157,63 @@ class PocaketBookState extends State<PocaketBookPage> {
       return Colors.red;
   }
 
-  String getRecordStr(double text, int type) {
+  String _formatDate(String date) {
+    var dateList = date.split('.');
+    print(dateList);
+    if (dateList.length == 3) {
+      var time = DateTime.now();
+      if (time.year == int.tryParse(dateList[0])) {
+        if (time.month == int.tryParse(dateList[1]) &&
+            time.day - int.tryParse(dateList[2]) < 3) {
+          var diff = time.day - int.tryParse(dateList[2]);
+          if (diff == 0) {
+            return "${dateList[1]}.${dateList[2]} 今天";
+          } else if (diff == 1) {
+            return "${dateList[1]}.${dateList[2]} 昨天";
+          } else if (diff == 2) {
+            return "${dateList[1]}.${dateList[2]} 前天";
+          } else {
+            return "${dateList[1]}.${dateList[2]}";
+          }
+        } else {
+          return "${dateList[1]}.${dateList[2]}";
+        }
+      } else {
+        return date;
+      }
+    } else {
+      return date;
+    }
+  }
+
+  String getRecordStr(String text, int type) {
     if (type == 1)
       return "+$text";
     else
       return "-$text";
   }
 
+  var db = PocketDatabaseHelper();
+
+  var allMoney = 0.00;
+  var incomeMoney = 0.00;
+  var exMoney = 0.00;
+
   _loadData(int page) async {
-    String jsonStr = await _loadAsset();
+//    String jsonStr = await _loadAsset();
+    var data = await db.getTotalList(page);
     setState(() {
-      pocketBookList = new PocketBookList.fromJson(json.decode(jsonStr)).list;
+//      pocketBookList = new PocketBookList.fromJson(json.decode(jsonStr)).list;
+      pocketBookList = data.list;
+      allMoney = 0.00;
+      incomeMoney = 0.00;
+      exMoney = 0.00;
+      data.list.forEach((item) {
+        incomeMoney += double.tryParse(item.income);
+        exMoney += double.tryParse(item.expenditure);
+      });
+      allMoney = incomeMoney - exMoney;
+      print(pocketBookList);
     });
   }
 
