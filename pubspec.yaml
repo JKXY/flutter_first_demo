@@ -23,6 +23,7 @@ dependencies:
   webview_flutter: ^0.3.14
   share: ^0.6.2+1
   sqflite: ^1.1.6
+  flutter_barcode_scanner: ^0.1.6
   flutter:
     sdk: flutter
 

@@ -9,4 +9,6 @@ class Strings{
   static const String income = "收入:";
   static const String expenditure = "支出:";
   static const String pcocketBookAdd = "记账";
+  static const String cancle = "取消";
+  static const String copy = "复制";
 }

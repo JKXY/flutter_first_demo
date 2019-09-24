@@ -1,6 +1,11 @@
 import 'package:FlutterDemo/bean/wanandroidBean.dart';
+import 'package:FlutterDemo/res/fonts/AntdIcons.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' as prefix0;
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../res/strings.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +20,7 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> {
+  var _scaffoldkey = new GlobalKey<ScaffoldState>();
   ScrollController _scrollController;
   int currPage = 0;
   bool isRefreshing = false;
@@ -25,6 +31,7 @@ class MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldkey,
         appBar: AppBar(
           title: const Text(Strings.app_name),
           actions: <Widget>[
@@ -125,19 +132,39 @@ class MainPageState extends State<MainPage> {
       crossAxisCount: 4,
       childAspectRatio: 1.0,
       children: <Widget>[
-        IconButton(icon: Icon(Icons.attach_money),onPressed: _toPocketBookPage,),
-        Icon(Icons.airport_shuttle),
+        IconButton(
+          icon: Icon(Icons.attach_money),
+          onPressed: _toPocketBookPage,
+        ),
+        IconButton(
+          icon: Icon(AntdIcons.scan),
+          onPressed: _parseQrcode,
+        ),
         Icon(Icons.all_inclusive),
         Icon(Icons.beach_access)
       ],
     ));
   }
 
-  void _toPocketBookPage(){
+  void _toPocketBookPage() {
     Navigator.of(context)
         .push(new MaterialPageRoute(builder: (BuildContext context) {
       return PocaketBookPage();
     }));
+  }
+
+  Future _parseQrcode() async {
+    var res = await FlutterBarcodeScanner.scanBarcode(
+        "#ff6666", Strings.cancle, true);
+    var snackBar = SnackBar(
+      content: new Text("$res"),
+      action: new SnackBarAction(
+          label: Strings.copy,
+          onPressed: () {
+            Clipboard.setData(new ClipboardData(text: res));
+          }),
+    );
+    _scaffoldkey.currentState.showSnackBar(snackBar);
   }
 
   void _pushSaved() {

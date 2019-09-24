@@ -13,4 +13,5 @@ class AntdIcons {
   static const IconData monitor = IconData(0xe7e2,fontFamily: 'AntdIcons');
   static const IconData gift = IconData(0xe842,fontFamily: 'AntdIcons');
   static const IconData skin_fill = IconData(0xe865,fontFamily: 'AntdIcons');
+  static const IconData scan = IconData(0xe7d4,fontFamily: 'AntdIcons');
 }
