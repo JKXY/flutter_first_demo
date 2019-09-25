@@ -69,6 +69,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     Icons.phone_android,
     Icons.widgets
   ];
+
   var currentNameIndex = 0;
 
   Widget _getTypeView() {

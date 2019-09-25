@@ -11,4 +11,5 @@ class Strings{
   static const String pcocketBookAdd = "记账";
   static const String cancle = "取消";
   static const String copy = "复制";
+  static const String todo = "TODO";
 }

@@ -1,5 +1,6 @@
 import 'package:FlutterDemo/bean/wanandroidBean.dart';
 import 'package:FlutterDemo/res/fonts/AntdIcons.dart';
+import 'package:FlutterDemo/ui/todo_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -140,7 +141,10 @@ class MainPageState extends State<MainPage> {
           icon: Icon(AntdIcons.scan),
           onPressed: _parseQrcode,
         ),
-        Icon(Icons.all_inclusive),
+        IconButton(
+          icon: Icon(Icons.all_inclusive),
+          onPressed: _toTodoPage,
+        ),
         Icon(Icons.beach_access)
       ],
     ));
@@ -150,6 +154,13 @@ class MainPageState extends State<MainPage> {
     Navigator.of(context)
         .push(new MaterialPageRoute(builder: (BuildContext context) {
       return PocaketBookPage();
+    }));
+  }
+
+  void _toTodoPage() {
+    Navigator.of(context)
+        .push(new MaterialPageRoute(builder: (BuildContext context) {
+      return TodoPage();
     }));
   }
 
