@@ -12,4 +12,5 @@ class Strings{
   static const String cancle = "取消";
   static const String copy = "复制";
   static const String todo = "TODO";
+  static const String todo_tip = "请输入TODO事项";
 }

@@ -1,4 +1,5 @@
 import 'package:FlutterDemo/bean/pocketBookBean.dart';
+import 'package:FlutterDemo/bean/todoBean.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -8,6 +9,7 @@ class PocketDatabaseHelper {
   factory PocketDatabaseHelper() => _instance;
   final String tableName = "table_pocket_book";
   final String tableNameRecord = "table_pocket_book_record";
+  final String tableNameTodo = "table_todo";
   final String columnId = "id";
   final String columnDate = "date";
   final String columnIncome = "income";
@@ -42,6 +44,9 @@ class PocketDatabaseHelper {
 
     await db.execute(
         "create table $tableNameRecord($columnId integer primary key autoincrement ,$columnType integer not null default 2 ,$columnDate text not null ,$columnMoney text ,$columnName text )");
+
+    await db.execute(
+        "create table $tableNameTodo($columnId integer primary key autoincrement ,$columnType integer not null default 2 ,$columnDate text not null ,$columnName text )");
   }
 
 //保存
@@ -94,6 +99,37 @@ class PocketDatabaseHelper {
     });
     return data;
   }
+
+
+  //保存Todo
+  Future<int> saveTodoItem(TodoBean bean) async {
+    var dbClient = await db;
+    int res = await dbClient.insert("$tableNameTodo", bean.toDbMap());
+    return res;
+  }
+
+
+  //保存Todo
+  Future<int> updataTodoItem(TodoBean bean) async {
+    var dbClient = await db;
+    int res = await dbClient.update("$tableNameTodo", bean.toDbMap(),
+        where: '$columnId = ?', whereArgs: [bean.id]);
+    return res;
+  }
+
+  //查询Todo
+  Future<TodoBeanList> getTodoList(bool isShowComplet) async {
+    var dbClient = await db;
+    var sqlStr = "";
+    if(isShowComplet)
+      sqlStr = "SELECT * FROM $tableNameTodo";
+    else
+      sqlStr = "SELECT * FROM $tableNameTodo WHERE $columnType = 2";
+    var result = await dbClient.rawQuery(sqlStr);
+    var data = TodoBeanList.fromJson(result.toList());
+    return data;
+  }
+
 
   //关闭
   Future close() async {

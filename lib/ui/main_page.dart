@@ -166,7 +166,7 @@ class MainPageState extends State<MainPage> {
 
   Future _parseQrcode() async {
     var res = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", Strings.cancle, true);
+        "#ff6666", Strings.cancle, true,ScanMode.DEFAULT);
     var snackBar = SnackBar(
       content: new Text("$res"),
       action: new SnackBarAction(

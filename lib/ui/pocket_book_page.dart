@@ -1,5 +1,5 @@
 import 'package:FlutterDemo/bean/pocketBookBean.dart';
-import 'package:FlutterDemo/data/PocketDatabaseHelper.dart';
+import 'package:FlutterDemo/data/DatabaseHelper.dart';
 import 'package:FlutterDemo/res/strings.dart';
 import 'package:FlutterDemo/ui/pocket_book_add_page.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +52,7 @@ class PocaketBookState extends State<PocaketBookPage> {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return PocketBookAddPage();
     })).then((isRefresh) {
-      if (isRefresh) _loadData(0);
+       _loadData(0);
     });
   }
 
@@ -117,7 +117,7 @@ class PocaketBookState extends State<PocaketBookPage> {
   Widget getRecordListView(List<PocketBookRecord> record) {
     if (record == null || record.length <= 0) {
 //      return null;
-      return Text("没记录");
+      return Text("暂无记录");
     } else {
       return ListView.separated(
         padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
@@ -202,18 +202,18 @@ class PocaketBookState extends State<PocaketBookPage> {
   _loadData(int page) async {
 //    String jsonStr = await _loadAsset();
     var data = await db.getTotalList(page);
+    pocketBookList = data.list;
+    allMoney = 0.00;
+    incomeMoney = 0.00;
+    exMoney = 0.00;
+    data.list.forEach((item) {
+      incomeMoney += double.tryParse(item.income);
+      exMoney += double.tryParse(item.expenditure);
+    });
+    allMoney = incomeMoney - exMoney;
+    print("allMoney: $allMoney");
     setState(() {
 //      pocketBookList = new PocketBookList.fromJson(json.decode(jsonStr)).list;
-      pocketBookList = data.list;
-      allMoney = 0.00;
-      incomeMoney = 0.00;
-      exMoney = 0.00;
-      data.list.forEach((item) {
-        incomeMoney += double.tryParse(item.income);
-        exMoney += double.tryParse(item.expenditure);
-      });
-      allMoney = incomeMoney - exMoney;
-      print(pocketBookList);
     });
   }
 
