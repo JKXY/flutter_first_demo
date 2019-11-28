@@ -24,6 +24,7 @@ dependencies:
   share: ^0.6.2+1
   sqflite: ^1.1.6
   flutter_barcode_scanner: ^0.1.6
+  shared_preferences: ^0.5.4+6
   flutter:
     sdk: flutter
 

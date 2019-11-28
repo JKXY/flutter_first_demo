@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../res/strings.dart';
 import 'package:provider/provider.dart';
-
 
 class ThemePage extends StatefulWidget {
   @override
@@ -22,8 +22,14 @@ class ThemePageState extends State<ThemePage> {
     );
   }
 
-
-  var _theme = [Colors.blue,Colors.green,Colors.grey,Colors.purple,Colors.yellow,Colors.red];
+  var _theme = [
+    Colors.blue,
+    Colors.green,
+    Colors.grey,
+    Colors.purple,
+    Colors.yellow,
+    Colors.red
+  ];
 
   Widget _buildThemeRow(int i) {
     return ListTile(
@@ -39,14 +45,18 @@ class ThemePageState extends State<ThemePage> {
 }
 
 
-class AppInfoProvider with ChangeNotifier {
-  MaterialColor _themeColor = Colors.blue;
+_saveThemeColor(MaterialColor themeColor) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt("ThemeColor", themeColor.value);
+}
 
+class AppInfoProvider with ChangeNotifier {
+  MaterialColor _themeColor;
   MaterialColor get themeColor => _themeColor;
 
   setTheme(MaterialColor themeColor) {
     _themeColor = themeColor;
+    _saveThemeColor(themeColor);
     notifyListeners();
   }
 }
-
