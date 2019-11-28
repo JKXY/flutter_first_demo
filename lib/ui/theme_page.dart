@@ -33,7 +33,7 @@ class ThemePageState extends State<ThemePage> {
 
   Widget _buildThemeRow(int i) {
     return ListTile(
-      title: new Text("主题", style: TextStyle(color: _theme[i])),
+      title: new Text(Strings.theme, style: TextStyle(color: _theme[i])),
       leading: new Icon(Icons.fiber_manual_record, color: _theme[i]),
       onTap: () {
         setState(() {

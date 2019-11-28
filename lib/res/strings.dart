@@ -13,4 +13,5 @@ class Strings{
   static const String copy = "复制";
   static const String todo = "TODO";
   static const String todo_tip = "请输入TODO事项";
+  static const String my_name = "JKXY";
 }

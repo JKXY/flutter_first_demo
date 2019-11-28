@@ -35,10 +35,8 @@ class MainPageState extends State<MainPage> {
         key: _scaffoldkey,
         appBar: AppBar(
           title: const Text(Strings.app_name),
-          actions: <Widget>[
-            IconButton(icon: const Icon(Icons.list), onPressed: _pushSaved)
-          ],
         ),
+        drawer: _getDrawer(),
         body: getBody());
   }
 
@@ -166,7 +164,7 @@ class MainPageState extends State<MainPage> {
 
   Future _parseQrcode() async {
     var res = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", Strings.cancle, true,ScanMode.DEFAULT);
+        "#ff6666", Strings.cancle, true, ScanMode.DEFAULT);
     var snackBar = SnackBar(
       content: new Text("$res"),
       action: new SnackBarAction(
@@ -178,11 +176,53 @@ class MainPageState extends State<MainPage> {
     _scaffoldkey.currentState.showSnackBar(snackBar);
   }
 
-  void _pushSaved() {
+  void _toThemePage() {
     Navigator.of(context)
         .push(new MaterialPageRoute(builder: (BuildContext context) {
       return ThemePage();
     }));
+  }
+
+  Widget _getDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    width: 60.0,
+                    height: 60.0,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: AssetImage("lib/res/images/logo_s.png"),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Text(Strings.my_name,
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
+                  )
+                ],
+              ),
+            ),
+          ),
+          ListTile(
+              leading: Icon(Icons.color_lens),
+              title: Text(Strings.theme),
+              onTap: (){
+                Navigator.of(context).pop();
+                _toThemePage();
+              }),
+        ],
+      ),
+    );
   }
 
   Widget _buildRow(int i) {
