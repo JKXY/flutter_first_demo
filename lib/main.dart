@@ -35,7 +35,9 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: Strings.app_name,
             home: MainPage(),
-            theme: ThemeData(primaryColor: appinfo.themeColor ?? localeTheme),
+            theme: ThemeData(
+                primaryColor: appinfo.themeColor ?? localeTheme,
+                accentColor: appinfo.themeColor ?? localeTheme),
           );
         },
       ),

@@ -69,7 +69,7 @@ class PocaketBookState extends State<PocaketBookPage> {
                 child: Center(
                     child: Text(
                   "$allMoney",
-                  style: TextStyle(fontSize: 30, color: Colors.red),
+                  style: TextStyle(fontSize: 30, color: Theme.of(context).primaryColor),
                 )),
               )
             ],
@@ -154,7 +154,7 @@ class PocaketBookState extends State<PocaketBookPage> {
     if (type == 1)
       return Colors.green;
     else
-      return Colors.red;
+      return Theme.of(context).primaryColor;
   }
 
   String _formatDate(String date) {

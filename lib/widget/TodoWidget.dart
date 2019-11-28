@@ -71,7 +71,7 @@ class TodoWidgetState extends State<TodoWidget> {
             height: 28,
             child: CircleAvatar(
                 backgroundColor: widget.switchValue
-                    ? Colors.lightBlue.shade400
+                    ? Theme.of(context).primaryColor
                     : Colors.red[300],
                 child: new Text(widget.switchValue ? "Y" : "N",
                     style: TextStyle(fontSize: 12.0, color: Colors.white))),

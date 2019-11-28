@@ -117,14 +117,14 @@ class TodoState extends State<TodoPage> {
                   }),
               FlatButton(
                 child: Text("添加"),
-                onPressed: () {
+                onPressed: () async{
                   var todo = _todoController.text;
                   if (todo != null && todo.trim().length > 0) {
                     var bean = TodoBean();
                     bean.type = 2;
                     bean.name = todo.trim();
                     bean.date = DateTime.now().toIso8601String();
-                    db.saveTodoItem(bean);
+                    await db.saveTodoItem(bean);
                     Navigator.of(context).pop(true); //关闭对话框
                     _todoController.clear();
                   } else {

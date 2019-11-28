@@ -132,18 +132,22 @@ class MainPageState extends State<MainPage> {
       childAspectRatio: 1.0,
       children: <Widget>[
         IconButton(
-          icon: Icon(Icons.attach_money),
+          icon: Icon(
+            Icons.attach_money,
+            color: Theme.of(context).primaryColor,
+          ),
           onPressed: _toPocketBookPage,
         ),
         IconButton(
-          icon: Icon(AntdIcons.scan),
+          icon: Icon(AntdIcons.scan, color: Theme.of(context).primaryColor),
           onPressed: _parseQrcode,
         ),
         IconButton(
-          icon: Icon(Icons.all_inclusive),
+          icon:
+              Icon(Icons.all_inclusive, color: Theme.of(context).primaryColor),
           onPressed: _toTodoPage,
         ),
-        Icon(Icons.favorite_border)
+        Icon(Icons.favorite_border, color: Theme.of(context).primaryColor)
       ],
     ));
   }
@@ -165,15 +169,17 @@ class MainPageState extends State<MainPage> {
   Future _parseQrcode() async {
     var res = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666", Strings.cancle, true, ScanMode.DEFAULT);
-    var snackBar = SnackBar(
-      content: new Text("$res"),
-      action: new SnackBarAction(
-          label: Strings.copy,
-          onPressed: () {
-            Clipboard.setData(new ClipboardData(text: res));
-          }),
-    );
-    _scaffoldkey.currentState.showSnackBar(snackBar);
+    if (res != null && res != "-1") {
+      var snackBar = SnackBar(
+        content: new Text("$res"),
+        action: new SnackBarAction(
+            label: Strings.copy,
+            onPressed: () {
+              Clipboard.setData(new ClipboardData(text: res));
+            }),
+      );
+      _scaffoldkey.currentState.showSnackBar(snackBar);
+    }
   }
 
   void _toThemePage() {
@@ -216,7 +222,7 @@ class MainPageState extends State<MainPage> {
           ListTile(
               leading: Icon(Icons.color_lens),
               title: Text(Strings.theme),
-              onTap: (){
+              onTap: () {
                 Navigator.of(context).pop();
                 _toThemePage();
               }),

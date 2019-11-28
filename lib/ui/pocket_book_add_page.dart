@@ -26,7 +26,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
       children: <Widget>[
         Expanded(
             child: DecoratedBox(
-          decoration: BoxDecoration(color: Colors.grey[300]),
+          decoration: BoxDecoration(color: Colors.grey[100]),
           position: DecorationPosition.background,
           child: _getTypeView(),
         )),
@@ -189,6 +189,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     );
   }
 
+  bool isSaveing = false;
   Widget _getNumberRowView(int index) {
     if (index == 3) {
       //x
@@ -199,7 +200,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     } else if (index == 15) {
       //保存
       return DecoratedBox(
-          decoration: BoxDecoration(color: Colors.red),
+          decoration: BoxDecoration(color: isSaveing ? Colors.grey: Theme.of(context).primaryColor),
           position: DecorationPosition.background,
           child: Center(
             child:
@@ -244,7 +245,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         var time = DateTime.now();
         var date = "${time.year}.${time.month}.${time.day}";
         record.date = date;
-        db.saveItem(record);
+        _saveData(record,false);
 
         currentNameIndex = 0;
         _typeValue = 2;
@@ -292,8 +293,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         var time = DateTime.now();
         var date = "${time.year}.${time.month}.${time.day}";
         record.date = date;
-        db.saveItem(record);
-        Navigator.of(context).pop(true);
+        _saveData(record,true);
         break;
       default: //数字
         if (_moneyValue.length >= 14) {
@@ -325,6 +325,19 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     }
     setState(() {});
   }
+
+  _saveData(PocketBookRecord data,bool isBack) async{
+    setState(() {
+      isSaveing = true;
+    });
+    await  db.saveItem(data);
+    setState(() {
+      isSaveing = false;
+    });
+    if(isBack)
+      Navigator.of(context).pop(true);
+  }
+
 
   @override
   void dispose() {
