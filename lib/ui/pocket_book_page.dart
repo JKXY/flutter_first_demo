@@ -52,7 +52,7 @@ class PocaketBookState extends State<PocaketBookPage> {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return PocketBookAddPage();
     })).then((isRefresh) {
-       _loadData(0);
+      _loadData(0);
     });
   }
 
@@ -69,7 +69,8 @@ class PocaketBookState extends State<PocaketBookPage> {
                 child: Center(
                     child: Text(
                   "$allMoney",
-                  style: TextStyle(fontSize: 30, color: Theme.of(context).primaryColor),
+                  style: TextStyle(
+                      fontSize: 30, color: Theme.of(context).primaryColor),
                 )),
               )
             ],
@@ -126,28 +127,124 @@ class PocaketBookState extends State<PocaketBookPage> {
         itemCount: record.length,
         itemBuilder: (context, index) {
           return ListTile(
-              title: new Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.brightness_1,
-                    color: getRecordColor(record[index].type),
-                    size: 5,
-                  ),
-                  Text(
-                    "  ${record[index].name}",
-                  )
-                ],
-              ),
-              trailing: Text(
-                getRecordStr(record[index].money, record[index].type),
-                style: TextStyle(color: getRecordColor(record[index].type)),
-              ));
+            title: new Row(
+              children: <Widget>[
+                Icon(
+                  Icons.brightness_1,
+                  color: getRecordColor(record[index].type),
+                  size: 5,
+                ),
+                Text("  ${record[index].name}",)
+              ],
+            ),
+            trailing: Text(
+              getRecordStr(record[index].money, record[index].type),
+              style: TextStyle(color: getRecordColor(record[index].type)),
+            ),
+            onTap: () {
+              _showDetailDialog(record[index]);
+            },
+          );
         },
         separatorBuilder: (context, index) {
           return Divider(height: 1);
         },
       );
     }
+  }
+
+  Future _showDetailDialog(PocketBookRecord data) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                        child: Text(
+                      Strings.pcocket_detail,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                    Text(
+                      Strings.detele,
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    )
+                  ],
+                ),
+              ),
+              Divider(height: 1),
+              Padding(
+                padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                child: Row(
+                  children: <Widget>[
+                    Text(Strings.money),
+                    Expanded(
+                        child: Text(
+                      getRecordStr(data.money, data.type),
+                      textAlign: TextAlign.end,
+                      style: TextStyle(color: getRecordColor(data.type)),
+                    ))
+                  ],
+                ),
+              ),
+              Divider(height: 1),
+              Padding(
+                padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                child: Row(
+                  children: <Widget>[
+                    Text(Strings.type),
+                    Expanded(
+                        child: Text(
+                          data.name,
+                          textAlign: TextAlign.end,
+                        ))
+                  ],
+                ),
+              ),
+              Divider(height: 1),
+              Padding(
+                padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                child: Row(
+                  children: <Widget>[
+                    Text(Strings.time),
+                    Expanded(
+                      child: Text(
+                        data.date,
+                        textAlign: TextAlign.end,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Visibility(
+                child: Divider(height: 1),
+                visible: data.remack.length > 0,
+              ),
+              Visibility(
+                child: Padding(
+                  padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                  child: Row(
+                    children: <Widget>[
+                      Text(Strings.remack),
+                      Expanded(
+                        child: Text(
+                          data.remack,
+                          textAlign: TextAlign.end,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                visible: data.remack.length > 0,
+              ),
+            ],
+          );
+        });
   }
 
   Color getRecordColor(int type) {

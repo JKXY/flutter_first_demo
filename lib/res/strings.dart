@@ -13,7 +13,12 @@ class Strings{
   static const String income = "收入:";
   static const String expenditure = "支出:";
   static const String pcocketBookAdd = "记账";
+  static const String pcocket_detail = "账单详情";
   static const String cancle = "取消";
+  static const String detele = "删除";
+  static const String money = "金额";
+  static const String type = "分类";
+  static const String time = "时间";
   static const String comfirm = "确认";
   static const String copy = "复制";
   static const String todo = "TODO";
