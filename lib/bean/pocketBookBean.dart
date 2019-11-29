@@ -56,6 +56,7 @@ class PocketBookRecord{
   String date;
   String money;
   String name;
+  String remack;
 
   static PocketBookRecord fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
@@ -64,6 +65,7 @@ class PocketBookRecord{
     dataBean.date = map['date'];
     dataBean.money = map['money'];
     dataBean.name = map['name'];
+    dataBean.remack = map['remack'];
     return dataBean;
   }
 
@@ -73,6 +75,7 @@ class PocketBookRecord{
     map['date'] = date;
     map['money'] = money;
     map['name'] = name;
+    map['remack'] = remack;
     return map;
   }
 
@@ -80,6 +83,7 @@ class PocketBookRecord{
     "type" : type,
     "date" : date,
     "money" : money,
+    "remack" : remack,
     "name" : name
   };
 }

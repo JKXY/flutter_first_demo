@@ -17,6 +17,7 @@ class PocketDatabaseHelper {
   final String columnType = "type";
   final String columnMoney = "money";
   final String columnName = "name";
+  final String columnRemack = "remack";
 
   static Database _db;
 
@@ -43,7 +44,7 @@ class PocketDatabaseHelper {
         "create table $tableName($columnId integer primary key autoincrement ,$columnDate text not null ,$columnIncome text ,$columnExpenditure text )");
 
     await db.execute(
-        "create table $tableNameRecord($columnId integer primary key autoincrement ,$columnType integer not null default 2 ,$columnDate text not null ,$columnMoney text ,$columnName text )");
+        "create table $tableNameRecord($columnId integer primary key autoincrement ,$columnType integer not null default 2 ,$columnDate text not null ,$columnMoney text ,$columnName text  ,$columnRemack text)");
 
     await db.execute(
         "create table $tableNameTodo($columnId integer primary key autoincrement ,$columnType integer not null default 2 ,$columnDate text not null ,$columnName text )");

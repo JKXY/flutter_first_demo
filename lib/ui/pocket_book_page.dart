@@ -138,7 +138,7 @@ class PocaketBookState extends State<PocaketBookPage> {
                   )
                 ],
               ),
-              trailing: new Text(
+              trailing: Text(
                 getRecordStr(record[index].money, record[index].type),
                 style: TextStyle(color: getRecordColor(record[index].type)),
               ));

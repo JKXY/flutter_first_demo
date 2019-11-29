@@ -70,12 +70,22 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     Icons.widgets
   ];
 
+  var incomeNameList = ["工资", "奖金", "红包", "投资", "外快", "其他"];
+  var incomeIconList = [
+    Icons.attach_money,
+    AntdIcons.money_collect,
+    AntdIcons.red_envelope,
+    AntdIcons.trophy,
+    Icons.child_friendly,
+    Icons.widgets
+  ];
+
   var currentNameIndex = 0;
 
   Widget _getTypeView() {
     return GridView.builder(
         shrinkWrap: false,
-        itemCount: nameList.length,
+        itemCount: _typeValue == 2 ? nameList.length : incomeNameList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 5, //横轴三个子widget
             childAspectRatio: 1.0 //宽高比为1时，子widget
@@ -85,8 +95,13 @@ class PocketBookAddState extends State<PocketBookAddPage> {
             title: Center(
               child: Column(
                 children: <Widget>[
-                  Icon(nameIconList[index], color: _typeColor(index)),
-                  Text(nameList[index],
+                  Icon(
+                      _typeValue == 2
+                          ? nameIconList[index]
+                          : incomeIconList[index],
+                      color: _typeColor(index)),
+                  Text(
+                      _typeValue == 2 ? nameList[index] : incomeNameList[index],
                       style: TextStyle(color: _typeColor(index), fontSize: 10))
                 ],
               ),
@@ -128,6 +143,50 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     "保存"
   ];
 
+  var currTimeStr =
+      "${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}";
+
+  Future<DateTime> _showDatePicker() {
+    var date = DateTime.now();
+    return showDatePicker(
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(date.year - 100),
+      lastDate: date,
+    );
+  }
+
+  var remackStr = "";
+  TextEditingController _remackController = TextEditingController();
+
+  Future<String> _showRemackDialog() {
+    return showDialog<String>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(Strings.remack),
+            content: TextField(
+              autofocus: true,
+              maxLines: 1,
+              controller: _remackController,
+              decoration: InputDecoration(
+                hintText: Strings.remack_dialog_hint,
+                border: InputBorder.none,
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(Strings.comfirm),
+                onPressed: () async {
+                  var remack = _remackController.text.trim();
+                  Navigator.of(context).pop(remack);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   Widget _getNumberView() {
     return Column(
       children: <Widget>[
@@ -143,6 +202,7 @@ class PocketBookAddState extends State<PocketBookAddPage> {
                 onChanged: (value) {
                   setState(() {
                     _typeValue = value;
+                    currentNameIndex = 0;
                   });
                 },
               ),
@@ -157,6 +217,44 @@ class PocketBookAddState extends State<PocketBookAddPage> {
                 onChanged: (value) {
                   setState(() {
                     _typeValue = value;
+                    currentNameIndex = 0;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.all(8),
+              child: GestureDetector(child: Text(
+                remackStr.trim().length > 0 ? remackStr : Strings.remack_hint,
+                textAlign: TextAlign.end,
+                style: TextStyle(fontSize: 12),
+              ),
+              onTap: () async{
+                remackStr = await _showRemackDialog();
+                setState(() {});
+              },),
+            ))
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              height: 30,
+              child: OutlineButton(
+//                splashColor: Colors.grey,
+                child: Text(
+                  currTimeStr,
+                  style: TextStyle(fontSize: 16),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
+                onPressed: () async {
+                  var selectTime = await _showDatePicker();
+                  setState(() {
+                    currTimeStr =
+                        "${selectTime.year}.${selectTime.month}.${selectTime.day}";
                   });
                 },
               ),
@@ -165,7 +263,11 @@ class PocketBookAddState extends State<PocketBookAddPage> {
                 child: Padding(
                     padding: EdgeInsets.only(right: 8),
                     child: Text(_moneyValue,
-                        textAlign: TextAlign.end, maxLines: 1)))
+                        style: TextStyle(
+                            fontSize: 22,
+                            color: Theme.of(context).primaryColor),
+                        textAlign: TextAlign.end,
+                        maxLines: 1)))
           ],
         ),
         GridView.builder(
@@ -178,9 +280,10 @@ class PocketBookAddState extends State<PocketBookAddPage> {
                 crossAxisSpacing: 1,
                 mainAxisSpacing: 1),
             itemBuilder: (context, index) {
-              return ListTile(
-                title: _getNumberRowView(index),
-                onTap: () {
+              return FlatButton(
+                color: index == 15 ? Theme.of(context).primaryColor : null,
+                child: _getNumberRowView(index),
+                onPressed: () {
                   _numberRowOnClick(index);
                 },
               );
@@ -190,30 +293,28 @@ class PocketBookAddState extends State<PocketBookAddPage> {
   }
 
   bool isSaveing = false;
+
   Widget _getNumberRowView(int index) {
     if (index == 3) {
       //x
-      return Center(
-          child: IconButton(
-        icon: Icon(Icons.backspace),
-      ));
+      return Icon(Icons.backspace);
     } else if (index == 15) {
       //保存
-      return DecoratedBox(
-          decoration: BoxDecoration(color: isSaveing ? Colors.grey: Theme.of(context).primaryColor),
-          position: DecorationPosition.background,
-          child: Center(
-            child:
-                Text(_numberList[index], style: TextStyle(color: Colors.white)),
-          ));
+      return Text(
+        _numberList[index],
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      );
     } else {
-      return Center(child: Text(_numberList[index]));
+      return Text(_numberList[index]);
     }
   }
 
   var db = PocketDatabaseHelper();
 
   var _isInput = false;
+
   _numberRowOnClick(int index) {
     switch (index) {
       case 3: //x
@@ -230,27 +331,41 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         break;
       case 11: //再记(注意+)
         var record = PocketBookRecord();
-        if(_moneyValue.contains('+')){
-          if(_moneyValue.endsWith('+')){
+        if (_moneyValue.contains('+')) {
+          if (_moneyValue.endsWith('+')) {
             _moneyValue = _moneyValue.replaceAll('+', '');
-          }else{
+          } else {
             var temp = _moneyValue.split('+');
             var count = double.tryParse(temp[0]) + double.tryParse(temp[1]);
             _moneyValue = count.toStringAsFixed(2);
           }
         }
-        record.money = _moneyValue;
-        record.type = _typeValue;
-        record.name = nameList[currentNameIndex];
-        var time = DateTime.now();
-        var date = "${time.year}.${time.month}.${time.day}";
-        record.date = date;
-        _saveData(record,false);
-
-        currentNameIndex = 0;
-        _typeValue = 2;
-        _moneyValue = '0.0';
-        _isInput = false;
+        if (double.tryParse(_moneyValue) > 0) {
+          record.money = _moneyValue;
+          record.type = _typeValue;
+          record.name = _typeValue == 2
+              ? nameList[currentNameIndex]
+              : incomeNameList[currentNameIndex];
+          var date = currTimeStr;
+          record.date = date;
+          record.remack = remackStr;
+          _saveData(record, false);
+          //复位
+          currentNameIndex = 0;
+//        _typeValue = 2;
+          _moneyValue = '0.0';
+          _isInput = false;
+          remackStr = "";
+        } else {
+          Fluttertoast.showToast(
+              msg: Strings.pcocket_number_error_tip,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIos: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
         break;
       case 12: //+
         if (_isInput && !_moneyValue.endsWith('+')) {
@@ -278,22 +393,36 @@ class PocketBookAddState extends State<PocketBookAddPage> {
         break;
       case 15: //保存(注意+)
         var record = PocketBookRecord();
-        if(_moneyValue.contains('+')){
-          if(_moneyValue.endsWith('+')){
+        if (_moneyValue.contains('+')) {
+          if (_moneyValue.endsWith('+')) {
             _moneyValue = _moneyValue.replaceAll('+', '');
-          }else{
+          } else {
             var temp = _moneyValue.split('+');
             var count = double.tryParse(temp[0]) + double.tryParse(temp[1]);
             _moneyValue = count.toStringAsFixed(2);
           }
         }
-        record.money = _moneyValue;
-        record.type = _typeValue;
-        record.name = nameList[currentNameIndex];
-        var time = DateTime.now();
-        var date = "${time.year}.${time.month}.${time.day}";
-        record.date = date;
-        _saveData(record,true);
+        if (double.tryParse(_moneyValue) > 0) {
+          record.money = _moneyValue;
+          record.type = _typeValue;
+          record.name = _typeValue == 2
+              ? nameList[currentNameIndex]
+              : incomeNameList[currentNameIndex];
+          var date = currTimeStr;
+          record.remack = remackStr;
+          record.date = date;
+          _saveData(record, true);
+        } else {
+          Fluttertoast.showToast(
+              msg: Strings.pcocket_number_error_tip,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIos: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+
         break;
       default: //数字
         if (_moneyValue.length >= 14) {
@@ -326,18 +455,16 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     setState(() {});
   }
 
-  _saveData(PocketBookRecord data,bool isBack) async{
+  _saveData(PocketBookRecord data, bool isBack) async {
     setState(() {
       isSaveing = true;
     });
-    await  db.saveItem(data);
+    await db.saveItem(data);
     setState(() {
       isSaveing = false;
     });
-    if(isBack)
-      Navigator.of(context).pop(true);
+    if (isBack) Navigator.of(context).pop(true);
   }
-
 
   @override
   void dispose() {

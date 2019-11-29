@@ -7,13 +7,15 @@ class WebViewPage extends StatefulWidget {
   final String title;
   final String url;
 
-  const WebViewPage(this.title,this.url, {Key key}):super(key: key);
+  const WebViewPage(this.title, this.url, {Key key}) : super(key: key);
 
   @override
   createState() => WebViewState();
 }
 
 class WebViewState extends State<WebViewPage> {
+  var isLoading = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,13 +25,24 @@ class WebViewState extends State<WebViewPage> {
             IconButton(icon: const Icon(Icons.share), onPressed: _share)
           ],
         ),
-        body: WebView(
-          initialUrl: widget.url,
-          javascriptMode: JavascriptMode.unrestricted,
-        )
-    );
+        body: Stack(
+          children: <Widget>[
+            WebView(
+              initialUrl: widget.url,
+              onPageFinished: (url) {
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              javascriptMode: JavascriptMode.unrestricted,
+            ),
+            Visibility(
+              child: LinearProgressIndicator(),
+              visible: isLoading
+            )
+          ],
+        ));
   }
-
 
   void _share() {
     Share.share(widget.url);

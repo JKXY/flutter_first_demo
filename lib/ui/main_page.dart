@@ -126,6 +126,9 @@ class MainPageState extends State<MainPage> {
 
   Widget HandleView() {
     return new Card(
+        elevation: 15,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14.0))),
+        margin: EdgeInsets.all(8),
         child: GridView.count(
       shrinkWrap: true,
       crossAxisCount: 4,
