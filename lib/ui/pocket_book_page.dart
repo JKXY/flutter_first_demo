@@ -40,7 +40,10 @@ class PocaketBookState extends State<PocaketBookPage> {
         Positioned(
           child: FloatingActionButton(
             child: Icon(Icons.add),
-            onPressed: _toAddPage,
+            onPressed: () {
+              _toAddPacketPage(
+                  "${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}");
+            },
           ),
           bottom: 20,
         )
@@ -48,10 +51,14 @@ class PocaketBookState extends State<PocaketBookPage> {
     );
   }
 
-  void _toAddPage() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return PocketBookAddPage();
-    })).then((isRefresh) {
+  void _toAddPacketPage(String time) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+            settings: RouteSettings(arguments: time),
+            builder: (context) {
+              return PocketBookAddPage();
+            }))
+        .then((isRefresh) {
       _loadData(0);
     });
   }
@@ -96,18 +103,23 @@ class PocaketBookState extends State<PocaketBookPage> {
           return Card(
               child: Column(
             children: <Widget>[
-              Padding(
-                padding:
-                    EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        child: new Text(
-                            _formatDate(pocketBookList[postion].date))),
-                    Text(
-                        "收:${pocketBookList[postion].income} 支:${pocketBookList[postion].expenditure}")
-                  ],
+              GestureDetector(
+                child: Padding(
+                  padding:
+                      EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: new Text(
+                              _formatDate(pocketBookList[postion].date))),
+                      Text(
+                          "收:${pocketBookList[postion].income} 支:${pocketBookList[postion].expenditure}")
+                    ],
+                  ),
                 ),
+                onTap: () {
+                  _toAddPacketPage(pocketBookList[postion].date);
+                },
               ),
               getRecordListView(pocketBookList[postion].record)
             ],
@@ -134,7 +146,9 @@ class PocaketBookState extends State<PocaketBookPage> {
                   color: getRecordColor(record[index].type),
                   size: 5,
                 ),
-                Text("  ${record[index].name}",)
+                Text(
+                  "  ${record[index].name}",
+                )
               ],
             ),
             trailing: Text(
@@ -156,91 +170,141 @@ class PocaketBookState extends State<PocaketBookPage> {
   Future _showDetailDialog(PocketBookRecord data) {
     return showModalBottomSheet(
         context: context,
+        backgroundColor: Colors.transparent,
         builder: (context) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Padding(
-                padding:
-                    EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        child: Text(
-                      Strings.pcocket_detail,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    Text(
-                      Strings.detele,
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                    )
-                  ],
-                ),
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: new BorderRadius.vertical(
+                top: new Radius.circular(15.0),
+                //bottom: new Radius.circular(20.0),
               ),
-              Divider(height: 1),
-              Padding(
-                padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
-                child: Row(
-                  children: <Widget>[
-                    Text(Strings.money),
-                    Expanded(
-                        child: Text(
-                      getRecordStr(data.money, data.type),
-                      textAlign: TextAlign.end,
-                      style: TextStyle(color: getRecordColor(data.type)),
-                    ))
-                  ],
-                ),
-              ),
-              Divider(height: 1),
-              Padding(
-                padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
-                child: Row(
-                  children: <Widget>[
-                    Text(Strings.type),
-                    Expanded(
-                        child: Text(
-                          data.name,
-                          textAlign: TextAlign.end,
-                        ))
-                  ],
-                ),
-              ),
-              Divider(height: 1),
-              Padding(
-                padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
-                child: Row(
-                  children: <Widget>[
-                    Text(Strings.time),
-                    Expanded(
-                      child: Text(
-                        data.date,
-                        textAlign: TextAlign.end,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Visibility(
-                child: Divider(height: 1),
-                visible: data.remack.length > 0,
-              ),
-              Visibility(
-                child: Padding(
-                  padding:  EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(left: 12),
                   child: Row(
                     children: <Widget>[
-                      Text(Strings.remack),
+                      Expanded(
+                          child: Text(
+                        Strings.pcocket_detail,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      )),
+                      IconButton(
+                        alignment: Alignment.center,
+                        onPressed: () async {
+                          var res = await _showComfrimDialog(data);
+                          if (res) {
+                            Navigator.of(context).pop();
+                            await db.detelePacket(data);
+                            _loadData(0);
+                          }
+                        },
+                        icon: Icon(Icons.delete,
+                            color: Theme.of(context).primaryColor),
+                      )
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Padding(
+                  padding:
+                      EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                  child: Row(
+                    children: <Widget>[
+                      Text(Strings.money),
+                      Expanded(
+                          child: Text(
+                        getRecordStr(data.money, data.type),
+                        textAlign: TextAlign.end,
+                        style: TextStyle(color: getRecordColor(data.type)),
+                      ))
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Padding(
+                  padding:
+                      EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                  child: Row(
+                    children: <Widget>[
+                      Text(Strings.type),
+                      Expanded(
+                          child: Text(
+                        data.name,
+                        textAlign: TextAlign.end,
+                      ))
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Padding(
+                  padding:
+                      EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                  child: Row(
+                    children: <Widget>[
+                      Text(Strings.time),
                       Expanded(
                         child: Text(
-                          data.remack,
+                          data.date,
                           textAlign: TextAlign.end,
                         ),
                       )
                     ],
                   ),
                 ),
-                visible: data.remack.length > 0,
+                Visibility(
+                  child: Divider(height: 1),
+                  visible: data.remack.length > 0,
+                ),
+                Visibility(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
+                    child: Row(
+                      children: <Widget>[
+                        Text(Strings.remack),
+                        Expanded(
+                          child: Text(
+                            data.remack,
+                            textAlign: TextAlign.end,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  visible: data.remack.length > 0,
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  Future<bool> _showComfrimDialog(PocketBookRecord data) {
+    return showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              Strings.tips,
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            content: Text(Strings.pcocket_delete_tips),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text(Strings.cancle),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  }),
+              FlatButton(
+                child: Text(Strings.comfirm),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
               ),
             ],
           );
@@ -308,7 +372,6 @@ class PocaketBookState extends State<PocaketBookPage> {
       exMoney += double.tryParse(item.expenditure);
     });
     allMoney = incomeMoney - exMoney;
-    print("allMoney: $allMoney");
     setState(() {
 //      pocketBookList = new PocketBookList.fromJson(json.decode(jsonStr)).list;
     });

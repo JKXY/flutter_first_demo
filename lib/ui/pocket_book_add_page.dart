@@ -12,8 +12,12 @@ class PocketBookAddPage extends StatefulWidget {
 }
 
 class PocketBookAddState extends State<PocketBookAddPage> {
+  String currTimeStr;
+
   @override
   Widget build(BuildContext context) {
+    if (currTimeStr == null)
+      currTimeStr = ModalRoute.of(context).settings.arguments;
     return Scaffold(
         appBar: AppBar(
           title: Text(Strings.pcocketBookAdd),
@@ -143,9 +147,6 @@ class PocketBookAddState extends State<PocketBookAddPage> {
     "保存"
   ];
 
-  var currTimeStr =
-      "${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}";
-
   Future<DateTime> _showDatePicker() {
     var date = DateTime.now();
     return showDatePicker(
@@ -225,15 +226,17 @@ class PocketBookAddState extends State<PocketBookAddPage> {
             Expanded(
                 child: Padding(
               padding: EdgeInsets.all(8),
-              child: GestureDetector(child: Text(
-                remackStr.trim().length > 0 ? remackStr : Strings.remack_hint,
-                textAlign: TextAlign.end,
-                style: TextStyle(fontSize: 12),
+              child: GestureDetector(
+                child: Text(
+                  remackStr.trim().length > 0 ? remackStr : Strings.remack_hint,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(fontSize: 12),
+                ),
+                onTap: () async {
+                  remackStr = await _showRemackDialog();
+                  setState(() {});
+                },
               ),
-              onTap: () async{
-                remackStr = await _showRemackDialog();
-                setState(() {});
-              },),
             ))
           ],
         ),
@@ -300,12 +303,23 @@ class PocketBookAddState extends State<PocketBookAddPage> {
       return Icon(Icons.backspace);
     } else if (index == 15) {
       //保存
-      return Text(
-        _numberList[index],
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      );
+      if (isSaveing) {
+        return SizedBox(
+          width: 25,
+          height: 25,
+          child: CircularProgressIndicator(
+              strokeWidth: 2,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation(Colors.white)),
+        );
+      } else {
+        return Text(
+          _numberList[index],
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        );
+      }
     } else {
       return Text(_numberList[index]);
     }
@@ -456,13 +470,17 @@ class PocketBookAddState extends State<PocketBookAddPage> {
   }
 
   _saveData(PocketBookRecord data, bool isBack) async {
-    setState(() {
-      isSaveing = true;
-    });
+    if (isBack) {
+      setState(() {
+        isSaveing = true;
+      });
+    }
     await db.saveItem(data);
-    setState(() {
-      isSaveing = false;
-    });
+    if (isBack) {
+      setState(() {
+        isSaveing = false;
+      });
+    }
     if (isBack) Navigator.of(context).pop(true);
   }
 

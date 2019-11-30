@@ -2,6 +2,7 @@ class Strings{
   static const String app_name = "Trainee";
   static const String hello_word = "Hello Word";
   static const String theme = "Theme";
+  static const String tips = "提示";
   static const String loadAllTip = "已加载全部数据!";
   static const String moneyLangeError = "数据太大了!";
   static const String pcocket_number_error_tip = "请输入大于0的金额!";
@@ -9,6 +10,7 @@ class Strings{
   static const String remack_hint = "点此输入备注...";
   static const String remack_dialog_hint = "请输入备注...";
   static const String pcocketBook = "记账本";
+  static const String pcocket_delete_tips = "是否确定删除该账单？";
   static const String allMoney = "总资产:";
   static const String income = "收入:";
   static const String expenditure = "支出:";

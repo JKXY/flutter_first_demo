@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'package:FlutterDemo/bean/pocketBookBean.dart';
 import 'package:FlutterDemo/bean/todoBean.dart';
 import 'package:sqflite/sqflite.dart';
@@ -50,7 +52,7 @@ class PocketDatabaseHelper {
         "create table $tableNameTodo($columnId integer primary key autoincrement ,$columnType integer not null default 2 ,$columnDate text not null ,$columnName text )");
   }
 
-//保存
+//保存账单
   Future<int> saveItem(PocketBookRecord record) async {
     var dbClient = await db;
     int res = await dbClient.insert("$tableNameRecord", record.toMap());
@@ -86,10 +88,42 @@ class PocketDatabaseHelper {
     return res;
   }
 
-  //查询
+  //删除账单
+  Future<int> detelePacket(PocketBookRecord record) async {
+    var dbClient = await db;
+    int res = await dbClient.delete("$tableNameRecord",
+        where: '$columnId = ?', whereArgs: [record.id]);
+    if (res > 0) {
+      var result = await dbClient.rawQuery(
+          "SELECT * FROM $tableNameRecord WHERE $columnDate = '${record.date}' ");
+      if (result.length > 0) {
+        var updataRes = await dbClient.rawQuery(
+            "SELECT * FROM $tableName WHERE $columnDate = '${record.date}' ");
+        var data = PocketBookBean.fromMap(updataRes.first);
+        if (record.type == 1) {
+          data.income =
+              (double.tryParse(data.income) - double.tryParse(record.money))
+                  .toStringAsFixed(2);
+        } else {
+          data.expenditure = (double.tryParse(data.expenditure) -
+              double.tryParse(record.money))
+              .toStringAsFixed(2);
+        }
+        await dbClient.update("$tableName", data.toDbMap(),
+            where: "$columnId = ?", whereArgs: [data.id]);
+      }else{
+        await dbClient.delete("$tableName",
+            where: '$columnDate = ?', whereArgs: [record.date]);
+      }
+    }
+    return res;
+  }
+
+  //查询账单
   Future<PocketBookList> getTotalList(int page) async {
     var dbClient = await db;
-    var result = await dbClient.rawQuery("SELECT * FROM $tableName ORDER BY $columnId DESC");
+    var result = await dbClient
+        .rawQuery("SELECT * FROM $tableName ORDER BY $columnId DESC");
 //    var result = await dbClient.rawQuery("SELECT * FROM $tableName ORDER BY $columnId DESC LIMIT ${page*20} OFFSET 20");
     var data = PocketBookList.fromJson(result.toList());
     await Future.forEach(data.list, (item) async {
@@ -101,14 +135,12 @@ class PocketDatabaseHelper {
     return data;
   }
 
-
   //保存Todo
   Future<int> saveTodoItem(TodoBean bean) async {
     var dbClient = await db;
     int res = await dbClient.insert("$tableNameTodo", bean.toDbMap());
     return res;
   }
-
 
   //保存Todo
   Future<int> updataTodoItem(TodoBean bean) async {
@@ -122,7 +154,7 @@ class PocketDatabaseHelper {
   Future<TodoBeanList> getTodoList(bool isShowComplet) async {
     var dbClient = await db;
     var sqlStr = "";
-    if(isShowComplet)
+    if (isShowComplet)
       sqlStr = "SELECT * FROM $tableNameTodo";
     else
       sqlStr = "SELECT * FROM $tableNameTodo WHERE $columnType = 2";
@@ -131,8 +163,7 @@ class PocketDatabaseHelper {
     return data;
   }
 
-
-  //关闭
+  //关闭数据库
   Future close() async {
     var dbClient = await db;
     return dbClient.close();

@@ -16,6 +16,7 @@ class PocketBookList {
 
 
 class PocketBookBean {
+  int id;
   String date;
   String income;
   String expenditure;
@@ -25,6 +26,7 @@ class PocketBookBean {
   static PocketBookBean fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
     PocketBookBean pocketBookBean = PocketBookBean();
+    pocketBookBean.id =map['id'];
     pocketBookBean.date =map['date'];
     pocketBookBean.income = map['income'];
     pocketBookBean.expenditure = map['expenditure'];
@@ -44,6 +46,7 @@ class PocketBookBean {
   }
 
   Map toDbJson() => {
+    "id" : id,
     "date" : date,
     "income" : income,
     "expenditure" : expenditure
@@ -52,6 +55,7 @@ class PocketBookBean {
 
 
 class PocketBookRecord{
+  int id;
   int type;//类型 1：收入 2：支出
   String date;
   String money;
@@ -61,6 +65,7 @@ class PocketBookRecord{
   static PocketBookRecord fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
     PocketBookRecord dataBean = PocketBookRecord();
+    dataBean.id = map['id'];
     dataBean.type = map['type'];
     dataBean.date = map['date'];
     dataBean.money = map['money'];
@@ -80,6 +85,7 @@ class PocketBookRecord{
   }
 
   Map toJson() => {
+    "id" : id,
     "type" : type,
     "date" : date,
     "money" : money,
