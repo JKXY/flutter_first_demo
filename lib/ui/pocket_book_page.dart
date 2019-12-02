@@ -175,8 +175,8 @@ class PocaketBookState extends State<PocaketBookPage> {
           return Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: new BorderRadius.vertical(
-                top: new Radius.circular(15.0),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(15.0),
                 //bottom: new Radius.circular(20.0),
               ),
             ),

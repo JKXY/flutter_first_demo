@@ -23,6 +23,7 @@ class ThemePageState extends State<ThemePage> {
   }
 
   var _theme = [
+    Colors.black,
     Colors.blue,
     Colors.green,
     Colors.grey,
@@ -45,16 +46,16 @@ class ThemePageState extends State<ThemePage> {
 }
 
 
-_saveThemeColor(MaterialColor themeColor) async {
+_saveThemeColor(Color themeColor) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setInt("ThemeColor", themeColor.value);
 }
 
 class AppInfoProvider with ChangeNotifier {
-  MaterialColor _themeColor;
-  MaterialColor get themeColor => _themeColor;
+  Color _themeColor;
+  Color get themeColor => _themeColor;
 
-  setTheme(MaterialColor themeColor) {
+  setTheme(Color themeColor) {
     _themeColor = themeColor;
     _saveThemeColor(themeColor);
     notifyListeners();

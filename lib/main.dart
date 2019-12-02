@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'res/strings.dart';
@@ -8,6 +11,13 @@ import './ui/main_page.dart';
 void main() async {
   var localeTheme = await _getThemeColor();
   runApp(MyApp(localeTheme));
+  if (Platform.isAndroid) {
+    // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，
+    // 是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
+    SystemUiOverlayStyle systemUiOverlayStyle =
+        SystemUiOverlayStyle(statusBarColor: Colors.transparent);
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
 }
 
 _getThemeColor() async {
@@ -35,12 +45,22 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: Strings.app_name,
             home: MainPage(),
-            theme: ThemeData(
-                primaryColor: appinfo.themeColor ?? localeTheme,
-                accentColor: appinfo.themeColor ?? localeTheme),
+            theme: _getThemeData(appinfo.themeColor),
           );
         },
       ),
     );
+  }
+
+  _getThemeData(Color color) {
+    var info = color ?? localeTheme;
+    if (info.value == Colors.black.value) {
+      return ThemeData(
+        brightness: Brightness.dark,
+      );
+    } else {
+      return ThemeData(
+          brightness: Brightness.light, primaryColor: info, accentColor: info);
+    }
   }
 }
