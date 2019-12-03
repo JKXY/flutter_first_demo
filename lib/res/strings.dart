@@ -26,5 +26,10 @@ class Strings{
   static const String todo = "TODO";
   static const String todo_tip = "请输入TODO事项";
   static const String my_name = "JKXY";
+  static const String timer = "Timer";
+  static const String hour = "小时";
+  static const String minute = "分钟";
+  static const String second = "秒";
+  static const String start = "开始";
 
 }

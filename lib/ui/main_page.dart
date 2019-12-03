@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:FlutterDemo/bean/wanandroidBean.dart';
 import 'package:FlutterDemo/res/fonts/AntdIcons.dart';
+import 'package:FlutterDemo/ui/timer_page.dart';
 import 'package:FlutterDemo/ui/todo_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -150,7 +151,11 @@ class MainPageState extends State<MainPage> {
               Icon(Icons.all_inclusive, color: Theme.of(context).primaryColor),
           onPressed: _toTodoPage,
         ),
-        Icon(Icons.favorite_border, color: Theme.of(context).primaryColor)
+        IconButton(
+          icon:
+          Icon(Icons.timer, color: Theme.of(context).primaryColor),
+          onPressed: _toTimerPage,
+        )
       ],
     ));
   }
@@ -166,6 +171,13 @@ class MainPageState extends State<MainPage> {
     Navigator.of(context)
         .push(new MaterialPageRoute(builder: (BuildContext context) {
       return TodoPage();
+    }));
+  }
+
+  void _toTimerPage() {
+    Navigator.of(context)
+        .push(new MaterialPageRoute(builder: (BuildContext context) {
+      return TimerPage();
     }));
   }
 

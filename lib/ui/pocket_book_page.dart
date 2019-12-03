@@ -320,7 +320,6 @@ class PocaketBookState extends State<PocaketBookPage> {
 
   String _formatDate(String date) {
     var dateList = date.split('.');
-    print(dateList);
     if (dateList.length == 3) {
       var time = DateTime.now();
       if (time.year == int.tryParse(dateList[0])) {
