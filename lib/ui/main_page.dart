@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:FlutterDemo/bean/quickStartBean.dart';
 import 'package:FlutterDemo/bean/wanandroidBean.dart';
 import 'package:FlutterDemo/res/fonts/AntdIcons.dart';
+import 'package:FlutterDemo/ui/quick_start_page.dart';
 import 'package:FlutterDemo/ui/timer_page.dart';
 import 'package:FlutterDemo/ui/todo_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/strings.dart';
 import '../ui/pocket_book_page.dart';
@@ -44,8 +47,22 @@ class MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    _QucikStart();
     _loadData(0);
     _scrollController = new ScrollController()..addListener(_scrollListener);
+  }
+
+  _QucikStart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    QuickStartBean quickStartPage =
+        QuickStartBean(name: "无", index: 0, icon: Icons.home);
+    String saveQucik = prefs.getString("QuickStart");
+    if (saveQucik != null) {
+      quickStartPage = QuickStartBean.fromMap(json.decode(saveQucik));
+    }
+    if (quickStartPage.index > 0) {
+      Navigator.of(context).pushNamed(quickStartPage.path);
+    }
   }
 
   @override
@@ -128,36 +145,36 @@ class MainPageState extends State<MainPage> {
   Widget HandleView() {
     return new Card(
         elevation: 15,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14.0))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(14.0))),
         margin: EdgeInsets.all(8),
         child: GridView.count(
-      shrinkWrap: true,
-      crossAxisCount: 4,
-      childAspectRatio: 1.0,
-      children: <Widget>[
-        IconButton(
-          icon: Icon(
-            Icons.attach_money,
-            color: Theme.of(context).primaryColor,
-          ),
-          onPressed: _toPocketBookPage,
-        ),
-        IconButton(
-          icon: Icon(AntdIcons.scan, color: Theme.of(context).primaryColor),
-          onPressed: _parseQrcode,
-        ),
-        IconButton(
-          icon:
-              Icon(Icons.all_inclusive, color: Theme.of(context).primaryColor),
-          onPressed: _toTodoPage,
-        ),
-        IconButton(
-          icon:
-          Icon(Icons.timer, color: Theme.of(context).primaryColor),
-          onPressed: _toTimerPage,
-        )
-      ],
-    ));
+          shrinkWrap: true,
+          crossAxisCount: 4,
+          childAspectRatio: 1.0,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.attach_money,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: _toPocketBookPage,
+            ),
+            IconButton(
+              icon: Icon(AntdIcons.scan, color: Theme.of(context).primaryColor),
+              onPressed: _parseQrcode,
+            ),
+            IconButton(
+              icon: Icon(Icons.all_inclusive,
+                  color: Theme.of(context).primaryColor),
+              onPressed: _toTodoPage,
+            ),
+            IconButton(
+              icon: Icon(Icons.timer, color: Theme.of(context).primaryColor),
+              onPressed: _toTimerPage,
+            )
+          ],
+        ));
   }
 
   void _toPocketBookPage() {
@@ -204,6 +221,13 @@ class MainPageState extends State<MainPage> {
     }));
   }
 
+  void _toQuickStartPage() {
+    Navigator.of(context)
+        .push(new MaterialPageRoute(builder: (BuildContext context) {
+      return QuickStartPage();
+    }));
+  }
+
   Widget _getDrawer() {
     return Drawer(
       child: ListView(
@@ -240,6 +264,13 @@ class MainPageState extends State<MainPage> {
               onTap: () {
                 Navigator.of(context).pop();
                 _toThemePage();
+              }),
+          ListTile(
+              leading: Icon(Icons.flight_takeoff),
+              title: Text(Strings.quick_start),
+              onTap: () {
+                Navigator.of(context).pop();
+                _toQuickStartPage();
               }),
         ],
       ),

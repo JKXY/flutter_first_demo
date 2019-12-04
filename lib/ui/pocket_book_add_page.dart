@@ -18,6 +18,8 @@ class PocketBookAddState extends State<PocketBookAddPage> {
   Widget build(BuildContext context) {
     if (currTimeStr == null)
       currTimeStr = ModalRoute.of(context).settings.arguments;
+    if(currTimeStr==null)
+      currTimeStr = "${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}";
     return Scaffold(
         appBar: AppBar(
           title: Text(Strings.pcocketBookAdd),

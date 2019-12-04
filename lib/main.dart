@@ -1,17 +1,28 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:FlutterDemo/ui/pocket_book_add_page.dart';
+import 'package:FlutterDemo/ui/timer_page.dart';
+import 'package:FlutterDemo/ui/todo_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'bean/quickStartBean.dart';
 import 'res/strings.dart';
 import 'ui/theme_page.dart';
 import './ui/main_page.dart';
 
 void main() async {
-  var localeTheme = await _getThemeColor();
+  Color localeTheme = Colors.blue;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int saveTheme = prefs.getInt("ThemeColor");
+  if (saveTheme != null) {
+    localeTheme = Color(saveTheme);
+  }
+
   _initNotification();
   runApp(MyApp(localeTheme));
   if (Platform.isAndroid) {
@@ -21,30 +32,6 @@ void main() async {
         SystemUiOverlayStyle(statusBarColor: Colors.transparent);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
   }
-}
-
-_getThemeColor() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  Color themeColor;
-  if (prefs.getInt("ThemeColor") != null) {
-    themeColor = Color(prefs.getInt("ThemeColor"));
-  } else {
-    themeColor = Colors.blue;
-  }
-  return themeColor;
-}
-
-class ReceivedNotification {
-  final int id;
-  final String title;
-  final String body;
-  final String payload;
-
-  ReceivedNotification(
-      {@required this.id,
-      @required this.title,
-      @required this.body,
-      @required this.payload});
 }
 
 _initNotification() async {
@@ -81,6 +68,11 @@ class MyApp extends StatelessWidget {
             title: Strings.app_name,
             home: MainPage(),
             theme: _getThemeData(appinfo.themeColor),
+            routes: <String, WidgetBuilder> {
+              '/todo': (BuildContext context) => TodoPage(),
+              '/bill': (BuildContext context) => PocketBookAddPage(),
+              '/timer': (BuildContext context) => TimerPage(),
+            }
           );
         },
       ),
