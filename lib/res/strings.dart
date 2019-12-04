@@ -31,5 +31,9 @@ class Strings{
   static const String minute = "分钟";
   static const String second = "秒";
   static const String start = "开始";
+  static const String pause = "暂停";
+  static const String goon = "继续";
+  static const String ok = "OK";
+  static const String timer_error_tip = "请选择正确的时间!";
 
 }

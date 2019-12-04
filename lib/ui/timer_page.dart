@@ -1,39 +1,43 @@
+import 'dart:async';
+
 import 'package:FlutterDemo/bean/timerTemplateBean.dart';
 import 'package:FlutterDemo/res/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class TimerPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => TimerState();
 }
 
+enum TimerStatus { SELECT, TIMER }
+
 class TimerState extends State<TimerPage> {
   var _hourController = FixedExtentScrollController();
   var _minuteController = FixedExtentScrollController();
   var _secondController = FixedExtentScrollController();
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-  }
-
-  _afterLayout(_) {
-    setState(() {
-      _updataTimerView(0);
-    });
-  }
+  var _status = TimerStatus.SELECT;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(Strings.timer)),
-      body: _getBody(),
+      body: _bodyView(),
     );
   }
 
-  _getBody() {
+  _bodyView() {
+    if (_status == TimerStatus.SELECT) {
+      return _getSelectView();
+    } else if (_status == TimerStatus.TIMER) {
+      return _countDownView();
+    }
+  }
+
+  _getSelectView() {
     return Container(
         child: Column(
       children: <Widget>[
@@ -86,7 +90,7 @@ class TimerState extends State<TimerPage> {
                     looping: true,
                     squeeze: 1,
                     children: List.generate(60, (index) {
-                      return Center(child: Text("${index}"));
+                      return Center(child: Text("$index"));
                     })),
               ),
             ),
@@ -101,7 +105,7 @@ class TimerState extends State<TimerPage> {
                   looping: true,
                   squeeze: 1,
                   children: List.generate(60, (index) {
-                    return Center(child: Text("${index}"));
+                    return Center(child: Text("$index"));
                   })),
             ))
           ],
@@ -122,8 +126,7 @@ class TimerState extends State<TimerPage> {
                           children: <Widget>[
                             Text("${templateData[index].name}",
                                 style: TextStyle(color: Colors.white)),
-                            Text(
-                                "${templateData[index].hour}:${templateData[index].minute}:${templateData[index].second}",
+                            Text("${_getSelectDateFormat(index)}",
                                 style: TextStyle(color: Colors.white))
                           ],
                         ),
@@ -148,7 +151,27 @@ class TimerState extends State<TimerPage> {
           height: 80,
           alignment: Alignment.center,
           child: FlatButton(
-            onPressed: () {},
+            onPressed: () {
+              _updataCurrTemplate();
+              int second = _hourController.selectedItem * 60 * 60 +
+                  _minuteController.selectedItem * 60 +
+                  _secondController.selectedItem;
+              if (second > 0) {
+                setState(() {
+                  _status = TimerStatus.TIMER;
+                  _startTimer(second, 0);
+                });
+              } else {
+                Fluttertoast.showToast(
+                    msg: Strings.timer_error_tip,
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIos: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0);
+              }
+            },
             child: Text(
               Strings.start,
               style: TextStyle(color: Colors.white),
@@ -162,22 +185,170 @@ class TimerState extends State<TimerPage> {
     ));
   }
 
+  _countDownView() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: 40),
+          Container(
+            height: 260,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 220,
+                  width: 220,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 8,
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
+                    backgroundColor: Theme.of(context).textSelectionColor,
+                    value: _oldSecond / _currSecond,
+                  ),
+                ),
+                Visibility(
+                    visible: !isTime,
+                    child: Text("${_getDateFormat(_dateTime)}",
+                        style: TextStyle(fontSize: 45))),
+                Visibility(
+                    visible: isTime,
+                    child: Icon(
+                      Icons.done,
+                      size: 50,
+                      color: Colors.green,
+                    )),
+                Positioned(
+                    top: 80,
+                    child: Text(
+                        "${currTemplate == -1 ? "" : templateData[currTemplate].name}"))
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Visibility(
+                visible: !isTime,
+                child: FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      if (isPause) {
+                        _startTimer(_currSecond, _oldSecond);
+                        isPause = false;
+                      } else {
+                        _timer.cancel();
+                        isPause = true;
+                      }
+                    });
+                  },
+                  child: Text(
+                    isPause ? Strings.goon : Strings.pause,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  color: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(25))),
+                ),
+              ),
+              Visibility(
+                  visible: !isTime, child: SizedBox(width: 60, height: 120)),
+              Visibility(
+                  visible: isTime, child: SizedBox(width: 0, height: 120)),
+              FlatButton(
+                onPressed: () {
+                  setState(() {
+                    FlutterRingtonePlayer.stop();
+                    isTime = false;
+                    isPause = false;
+                    _status = TimerStatus.SELECT;
+                    currTemplate = -1;
+                    _timer.cancel();
+                  });
+                },
+                child: Text(
+                  isTime ? Strings.ok : Strings.cancle,
+                  style: TextStyle(color: Colors.white),
+                ),
+                color: Colors.red,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25))),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Timer _timer;
+  int _currSecond = 0;
+  int _oldSecond = 0;
+  DateTime _dateTime;
+  bool isPause = false;
+  bool isTime = false;
+
+  _startTimer(int second, int oldSecond) {
+    _currSecond = second;
+    oldSecond += 1; //启动需要1s,所以要-1s
+    _oldSecond = oldSecond;
+    _dateTime =
+        DateTime.fromMillisecondsSinceEpoch(second * 1000 - oldSecond * 1000);
+    _timer = Timer.periodic(Duration(seconds: 1), (timber) {
+      _oldSecond++;
+      if (_oldSecond >= second) {
+        timber.cancel();
+        isTime = true;
+        FlutterRingtonePlayer.playAlarm(looping: true);
+      } else {
+        _dateTime = _dateTime.subtract(Duration(seconds: 1));
+      }
+      setState(() {});
+    });
+  }
+
+  _getSelectDateFormat(int index){
+    int second = templateData[index].hour * 60 * 60 +
+        templateData[index].minute * 60 +
+        templateData[index].second;
+    return _getDateFormat(DateTime.fromMillisecondsSinceEpoch(second*1000));
+  }
+
+  _getDateFormat(DateTime dateTime){
+    if(dateTime == null)
+      return "00:00:00";
+    else
+      return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+  }
+
   _updataTimerView(int index) {
-    if (_hourController.selectedItem != templateData[index].hour) {
+    if (_hourController != null &&
+        _hourController.selectedItem != templateData[index].hour) {
       _hourController.animateToItem(templateData[index].hour,
           duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
-    if (_minuteController.selectedItem != templateData[index].minute) {
+    if (_minuteController != null &&
+        _minuteController.selectedItem != templateData[index].minute) {
       _minuteController.animateToItem(templateData[index].minute,
           duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
-    if (_secondController.selectedItem != templateData[index].second) {
+    if (_secondController != null &&
+        _secondController.selectedItem != templateData[index].second) {
       _secondController.animateToItem(templateData[index].second,
           duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
   }
 
-  var currTemplate = 0;
+  _updataCurrTemplate() {
+    if (currTemplate >= 0 &&
+        currTemplate < templateData.length &&
+        _hourController.selectedItem == templateData[currTemplate].hour &&
+        _minuteController.selectedItem == templateData[currTemplate].minute &&
+        _secondController.selectedItem == templateData[currTemplate].second) {
+    } else {
+      currTemplate = -1;
+    }
+  }
+
+  var currTemplate = -1;
   var templateData = [
     TimerTemplateBean(name: "午睡", minute: 30),
     TimerTemplateBean(name: "敷面膜", minute: 15),
@@ -191,9 +362,11 @@ class TimerState extends State<TimerPage> {
 
   @override
   void dispose() {
-    _hourController.dispose();
-    _minuteController.dispose();
-    _secondController.dispose();
+    _timer?.cancel();
+    FlutterRingtonePlayer.stop();
+    _hourController?.dispose();
+    _minuteController?.dispose();
+    _secondController?.dispose();
     super.dispose();
   }
 }

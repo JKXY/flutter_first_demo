@@ -25,6 +25,7 @@ dependencies:
   sqflite: ^1.1.6
   flutter_barcode_scanner: ^0.1.6
   shared_preferences: ^0.5.4+6
+  flutter_ringtone_player: ^1.0.3
   flutter:
     sdk: flutter
 
