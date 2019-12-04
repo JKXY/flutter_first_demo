@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:math';
 
 import 'package:FlutterDemo/bean/timerTemplateBean.dart';
 import 'package:FlutterDemo/res/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -23,9 +26,20 @@ class TimerState extends State<TimerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(Strings.timer)),
-      body: _bodyView(),
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(title: Text(Strings.timer)),
+        body: _bodyView(),
+      ),
+      onWillPop: () async {
+        if (_status == TimerStatus.SELECT ||
+            (_status == TimerStatus.TIMER && isTime)) {
+          return true;
+        } else {
+          _showTimberDialog();
+          return false;
+        }
+      },
     );
   }
 
@@ -40,149 +54,153 @@ class TimerState extends State<TimerPage> {
   _getSelectView() {
     return Container(
         child: Column(
-      children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            Expanded(
-                child: Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: Center(child: Text(Strings.hour)),
-            )),
-            Expanded(
-                child: Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: Center(child: Text(Strings.minute)),
-            )),
-            Expanded(
-                child: Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: Center(child: Text(Strings.second)),
-            )),
-          ],
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Expanded(
-              child: SizedBox(
-                height: 200,
-                child: CupertinoPicker(
-                    scrollController: _hourController,
-                    backgroundColor: Colors.transparent,
-                    itemExtent: 32,
-                    onSelectedItemChanged: null,
-                    looping: true,
-                    squeeze: 1,
-                    children: List.generate(99, (index) {
-                      return Center(child: Text("${index}"));
-                    })),
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Center(child: Text(Strings.hour)),
+                    )),
+                Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Center(child: Text(Strings.minute)),
+                    )),
+                Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Center(child: Text(Strings.second)),
+                    )),
+              ],
             ),
-            Expanded(
-              child: SizedBox(
-                height: 200,
-                child: CupertinoPicker(
-                    scrollController: _minuteController,
-                    backgroundColor: Colors.transparent,
-                    itemExtent: 32,
-                    onSelectedItemChanged: null,
-                    looping: true,
-                    squeeze: 1,
-                    children: List.generate(60, (index) {
-                      return Center(child: Text("$index"));
-                    })),
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: SizedBox(
+                    height: 200,
+                    child: CupertinoPicker(
+                        scrollController: _hourController,
+                        backgroundColor: Colors.transparent,
+                        itemExtent: 32,
+                        onSelectedItemChanged: null,
+                        looping: true,
+                        squeeze: 1,
+                        children: List.generate(99, (index) {
+                          return Center(child: Text("${index}"));
+                        })),
+                  ),
+                ),
+                Expanded(
+                  child: SizedBox(
+                    height: 200,
+                    child: CupertinoPicker(
+                        scrollController: _minuteController,
+                        backgroundColor: Colors.transparent,
+                        itemExtent: 32,
+                        onSelectedItemChanged: null,
+                        looping: true,
+                        squeeze: 1,
+                        children: List.generate(60, (index) {
+                          return Center(child: Text("$index"));
+                        })),
+                  ),
+                ),
+                Expanded(
+                    child: SizedBox(
+                      height: 200,
+                      child: CupertinoPicker(
+                          scrollController: _secondController,
+                          backgroundColor: Colors.transparent,
+                          itemExtent: 32,
+                          onSelectedItemChanged: null,
+                          looping: true,
+                          squeeze: 1,
+                          children: List.generate(60, (index) {
+                            return Center(child: Text("$index"));
+                          })),
+                    ))
+              ],
             ),
-            Expanded(
-                child: SizedBox(
-              height: 200,
-              child: CupertinoPicker(
-                  scrollController: _secondController,
-                  backgroundColor: Colors.transparent,
-                  itemExtent: 32,
-                  onSelectedItemChanged: null,
-                  looping: true,
-                  squeeze: 1,
-                  children: List.generate(60, (index) {
-                    return Center(child: Text("$index"));
-                  })),
-            ))
-          ],
-        ),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-              itemExtent: 85,
-              itemCount: templateData.length,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: Container(
-                      margin: EdgeInsets.all(8),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text("${templateData[index].name}",
-                                style: TextStyle(color: Colors.white)),
-                            Text("${_getSelectDateFormat(index)}",
-                                style: TextStyle(color: Colors.white))
-                          ],
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                          color: currTemplate == index
-                              ? Theme.of(context).primaryColor
-                              : (Theme.of(context).brightness == Brightness.dark
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                  itemExtent: 85,
+                  itemCount: templateData.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      child: Container(
+                          margin: EdgeInsets.all(8),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text("${templateData[index].name}",
+                                    style: TextStyle(color: Colors.white)),
+                                Text("${_getSelectDateFormat(index)}",
+                                    style: TextStyle(color: Colors.white))
+                              ],
+                            ),
+                          ),
+                          decoration: BoxDecoration(
+                              color: currTemplate == index
+                                  ? Theme
+                                  .of(context)
+                                  .primaryColor
+                                  : (Theme
+                                  .of(context)
+                                  .brightness == Brightness.dark
                                   ? Colors.white10
                                   : Colors.grey[400]),
-                          shape: BoxShape.circle)),
-                  onTap: () {
-                    setState(() {
-                      _updataTimerView(index);
-                      currTemplate = index;
-                    });
-                  },
-                );
-              }),
-        ),
-        Container(
-          height: 80,
-          alignment: Alignment.center,
-          child: FlatButton(
-            onPressed: () {
-              _updataCurrTemplate();
-              int second = _hourController.selectedItem * 60 * 60 +
-                  _minuteController.selectedItem * 60 +
-                  _secondController.selectedItem;
-              if (second > 0) {
-                setState(() {
-                  _status = TimerStatus.TIMER;
-                  _startTimer(second, 0);
-                });
-              } else {
-                Fluttertoast.showToast(
-                    msg: Strings.timer_error_tip,
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIos: 1,
-                    backgroundColor: Colors.red,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-              }
-            },
-            child: Text(
-              Strings.start,
-              style: TextStyle(color: Colors.white),
+                              shape: BoxShape.circle)),
+                      onTap: () {
+                        setState(() {
+                          _updataTimerView(index);
+                          currTemplate = index;
+                        });
+                      },
+                    );
+                  }),
             ),
-            color: Colors.red,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25))),
-          ),
-        )
-      ],
-    ));
+            Container(
+              height: 80,
+              alignment: Alignment.center,
+              child: FlatButton(
+                onPressed: () {
+                  _updataCurrTemplate();
+                  int second = _hourController.selectedItem * 60 * 60 +
+                      _minuteController.selectedItem * 60 +
+                      _secondController.selectedItem;
+                  if (second > 0) {
+                    setState(() {
+                      _status = TimerStatus.TIMER;
+                      _startTimer(second, 0);
+                    });
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: Strings.timer_error_tip,
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIos: 1,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                  }
+                },
+                child: Text(
+                  Strings.start,
+                  style: TextStyle(color: Colors.white),
+                ),
+                color: Colors.red,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25))),
+              ),
+            )
+          ],
+        ));
   }
 
   _countDownView() {
@@ -201,7 +219,9 @@ class TimerState extends State<TimerPage> {
                   child: CircularProgressIndicator(
                     strokeWidth: 8,
                     valueColor: AlwaysStoppedAnimation(Colors.white),
-                    backgroundColor: Theme.of(context).textSelectionColor,
+                    backgroundColor: Theme
+                        .of(context)
+                        .textSelectionColor,
                     value: _oldSecond / _currSecond,
                   ),
                 ),
@@ -219,7 +239,8 @@ class TimerState extends State<TimerPage> {
                 Positioned(
                     top: 80,
                     child: Text(
-                        "${currTemplate == -1 ? "" : templateData[currTemplate].name}"))
+                        "${currTemplate == -1 ? "" : templateData[currTemplate]
+                            .name}"))
               ],
             ),
           ),
@@ -279,6 +300,34 @@ class TimerState extends State<TimerPage> {
     );
   }
 
+  Future<void> _showTimberDialog() {
+    return showDialog<String>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(Strings.tips),
+            content: Text(Strings.timer_tip),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(Strings.cancle),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text(Strings.comfirm),
+                onPressed: () async {
+                  _addNotification(_currSecond - _oldSecond);
+                  Navigator.pop(context);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   Timer _timer;
   int _currSecond = 0;
   int _oldSecond = 0;
@@ -305,18 +354,29 @@ class TimerState extends State<TimerPage> {
     });
   }
 
-  _getSelectDateFormat(int index){
+  _getSelectDateFormat(int index) {
     int second = templateData[index].hour * 60 * 60 +
         templateData[index].minute * 60 +
         templateData[index].second;
-    return _getDateFormat(DateTime.fromMillisecondsSinceEpoch(second*1000));
+    if (second <= 0) return "00:00";
+    var dateTime = DateTime.fromMillisecondsSinceEpoch(second * 1000);
+    if (dateTime.hour > 0) {
+      return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute
+          .toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(
+          2, '0')}";
+    } else {
+      return "${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second
+          .toString().padLeft(2, '0')}";
+    }
   }
 
-  _getDateFormat(DateTime dateTime){
-    if(dateTime == null)
+  _getDateFormat(DateTime dateTime) {
+    if (dateTime == null)
       return "00:00:00";
     else
-      return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+      return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute
+          .toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(
+          2, '0')}";
   }
 
   _updataTimerView(int index) {
@@ -342,8 +402,8 @@ class TimerState extends State<TimerPage> {
         currTemplate < templateData.length &&
         _hourController.selectedItem == templateData[currTemplate].hour &&
         _minuteController.selectedItem == templateData[currTemplate].minute &&
-        _secondController.selectedItem == templateData[currTemplate].second) {
-    } else {
+        _secondController.selectedItem ==
+            templateData[currTemplate].second) {} else {
       currTemplate = -1;
     }
   }
@@ -352,13 +412,43 @@ class TimerState extends State<TimerPage> {
   var templateData = [
     TimerTemplateBean(name: "午睡", minute: 30),
     TimerTemplateBean(name: "敷面膜", minute: 15),
+    TimerTemplateBean(name: "洗衣服", minute: 45),
     TimerTemplateBean(name: "泡面", minute: 3),
     TimerTemplateBean(name: "泡脚", minute: 30),
-    TimerTemplateBean(name: "洗衣服", minute: 45),
     TimerTemplateBean(name: "刷牙", minute: 3),
-    TimerTemplateBean(name: "煮饭", minute: 30),
-    TimerTemplateBean(name: "泡面", minute: 3)
+    TimerTemplateBean(name: "煮饭", minute: 30)
   ];
+
+  _addNotification(int second) async {
+    var scheduledNotificationDateTime =
+    new DateTime.now().add(new Duration(seconds: second));
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    new FlutterLocalNotificationsPlugin();
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        '0', 'Timber', 'Timer time is up notification',
+        importance: Importance.Max, priority: Priority.High, ticker: 'Timber');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.schedule(
+        Random().nextInt(10000),
+        Strings.app_name,
+        "${_getNotificationContent()} Timer time is up !",
+        scheduledNotificationDateTime,
+        platformChannelSpecifics,
+        payload: 'timer',
+        androidAllowWhileIdle: true);
+  }
+
+  _getNotificationContent() {
+    var temp = "";
+    if (currTemplate >= 0 && currTemplate < templateData.length) {
+      temp = "[ ${templateData[currTemplate].name} ]";
+    } else {
+      temp = "[ ${_getDateFormat(DateTime.fromMillisecondsSinceEpoch(_currSecond * 1000))} ]";
+    }
+    return temp;
+  }
 
   @override
   void dispose() {

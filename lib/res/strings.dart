@@ -35,5 +35,6 @@ class Strings{
   static const String goon = "继续";
   static const String ok = "OK";
   static const String timer_error_tip = "请选择正确的时间!";
+  static const String timer_tip = "定时器尚未完成,是否加入后台执行？";
 
 }
