@@ -117,7 +117,7 @@ class TodoState extends State<TodoPage> {
                   }),
               FlatButton(
                 child: Text("添加"),
-                onPressed: () async{
+                onPressed: () async {
                   var todo = _todoController.text;
                   if (todo != null && todo.trim().length > 0) {
                     var bean = TodoBean();

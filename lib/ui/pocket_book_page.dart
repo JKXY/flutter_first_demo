@@ -191,7 +191,9 @@ class PocaketBookState extends State<PocaketBookPage> {
                           child: Text(
                         Strings.pcocket_detail,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
                       )),
                       IconButton(
                         alignment: Alignment.center,
@@ -215,7 +217,7 @@ class PocaketBookState extends State<PocaketBookPage> {
                       EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
                   child: Row(
                     children: <Widget>[
-                      Text(Strings.money),
+                      Text(Strings.money,style: TextStyle(color: Colors.black)),
                       Expanded(
                           child: Text(
                         getRecordStr(data.money, data.type),
@@ -231,10 +233,11 @@ class PocaketBookState extends State<PocaketBookPage> {
                       EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
                   child: Row(
                     children: <Widget>[
-                      Text(Strings.type),
+                      Text(Strings.type,style: TextStyle(color: Colors.black)),
                       Expanded(
                           child: Text(
                         data.name,
+                        style: TextStyle(color: Colors.black),
                         textAlign: TextAlign.end,
                       ))
                     ],
@@ -246,10 +249,11 @@ class PocaketBookState extends State<PocaketBookPage> {
                       EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
                   child: Row(
                     children: <Widget>[
-                      Text(Strings.time),
+                      Text(Strings.time,style: TextStyle(color: Colors.black)),
                       Expanded(
                         child: Text(
                           data.date,
+                          style: TextStyle(color: Colors.black),
                           textAlign: TextAlign.end,
                         ),
                       )
@@ -258,7 +262,7 @@ class PocaketBookState extends State<PocaketBookPage> {
                 ),
                 Visibility(
                   child: Divider(height: 1),
-                  visible: data.remack.length > 0,
+                  visible: data.remack != null && data.remack.length > 0,
                 ),
                 Visibility(
                   child: Padding(
@@ -266,17 +270,18 @@ class PocaketBookState extends State<PocaketBookPage> {
                         EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
                     child: Row(
                       children: <Widget>[
-                        Text(Strings.remack),
+                        Text(Strings.remack,style: TextStyle(color: Colors.black)),
                         Expanded(
                           child: Text(
-                            data.remack,
+                            data.remack != null ? data.remack : "",
+                            style: TextStyle(color: Colors.black),
                             textAlign: TextAlign.end,
                           ),
                         )
                       ],
                     ),
                   ),
-                  visible: data.remack.length > 0,
+                  visible: data.remack != null && data.remack.length > 0,
                 ),
               ],
             ),

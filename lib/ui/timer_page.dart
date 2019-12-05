@@ -340,7 +340,7 @@ class TimerState extends State<TimerPage> {
     oldSecond += 1; //启动需要1s,所以要-1s
     _oldSecond = oldSecond;
     _dateTime =
-        DateTime.fromMillisecondsSinceEpoch(second * 1000 - oldSecond * 1000);
+        DateTime.fromMillisecondsSinceEpoch(second * 1000 - oldSecond * 1000,isUtc: true);
     _timer = Timer.periodic(Duration(seconds: 1), (timber) {
       _oldSecond++;
       if (_oldSecond >= second) {
@@ -359,7 +359,7 @@ class TimerState extends State<TimerPage> {
         templateData[index].minute * 60 +
         templateData[index].second;
     if (second <= 0) return "00:00";
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(second * 1000);
+    var dateTime = DateTime.fromMillisecondsSinceEpoch(second * 1000,isUtc: true);
     if (dateTime.hour > 0) {
       return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute
           .toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(
@@ -445,7 +445,7 @@ class TimerState extends State<TimerPage> {
     if (currTemplate >= 0 && currTemplate < templateData.length) {
       temp = "[ ${templateData[currTemplate].name} ]";
     } else {
-      temp = "[ ${_getDateFormat(DateTime.fromMillisecondsSinceEpoch(_currSecond * 1000))} ]";
+      temp = "[ ${_getDateFormat(DateTime.fromMillisecondsSinceEpoch(_currSecond * 1000,isUtc: true))} ]";
     }
     return temp;
   }

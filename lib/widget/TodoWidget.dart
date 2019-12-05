@@ -59,7 +59,9 @@ class TodoWidgetState extends State<TodoWidget> {
       children: <Widget>[
         Chip(
           key: _lableKey,
-          backgroundColor: Color(0xffE5E5E5),
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white10
+              : Color(0xffE5E5E5),
           padding: EdgeInsets.all(3),
           label: Text(widget.switchValue
               ? "${widget.content}        "

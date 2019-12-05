@@ -4,6 +4,7 @@ class Strings{
   static const String theme = "Theme";
   static const String tips = "提示";
   static const String loadAllTip = "已加载全部数据!";
+  static const String network_error = "网络请求错误，数据加载失败!";
   static const String moneyLangeError = "数据太大了!";
   static const String pcocket_number_error_tip = "请输入大于0的金额!";
   static const String remack = "备注";
@@ -37,5 +38,8 @@ class Strings{
   static const String timer_error_tip = "请选择正确的时间!";
   static const String timer_tip = "定时器尚未完成,是否加入后台执行？";
   static const String quick_start = "Quick Start";
+  static const String sister_image = "Sister Image";
+  static const String sister_image_order_yes = "切换成顺序模式";
+  static const String sister_image_order_no = "切换成随机模式";
 
 }

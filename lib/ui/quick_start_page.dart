@@ -54,7 +54,7 @@ class QuickStartState extends State<QuickStartPage> {
   }
 
   var quickData = [
-    QuickStartBean(name: "无", index: 0, icon: Icons.home),
+    QuickStartBean(name: "Nothing", index: 0, icon: Icons.home),
     QuickStartBean(name: "Add Bill Page", path:"/bill",index: 1, icon: Icons.attach_money),
     QuickStartBean(name: "TODO Page", path:"/todo",index: 2, icon: Icons.all_inclusive),
     QuickStartBean(name: "Timer Page", path:"/timer",index: 3, icon: Icons.timer),
@@ -68,7 +68,7 @@ class QuickStartState extends State<QuickStartPage> {
   _getSaveQucikStart() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     QuickStartBean quickStartPage =
-    QuickStartBean(name: "无", index: 0, icon: Icons.home);
+    QuickStartBean(name: "Nothing", index: 0, icon: Icons.home);
     String saveQucik = prefs.getString("QuickStart");
     if (saveQucik != null) {
       quickStartPage = QuickStartBean.fromMap(json.decode(saveQucik));

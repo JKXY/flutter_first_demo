@@ -4,6 +4,7 @@ import 'package:FlutterDemo/bean/quickStartBean.dart';
 import 'package:FlutterDemo/bean/wanandroidBean.dart';
 import 'package:FlutterDemo/res/fonts/AntdIcons.dart';
 import 'package:FlutterDemo/ui/quick_start_page.dart';
+import 'package:FlutterDemo/ui/sister_image_page.dart';
 import 'package:FlutterDemo/ui/timer_page.dart';
 import 'package:FlutterDemo/ui/todo_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -179,21 +180,21 @@ class MainPageState extends State<MainPage> {
 
   void _toPocketBookPage() {
     Navigator.of(context)
-        .push(new MaterialPageRoute(builder: (BuildContext context) {
+        .push(new CupertinoPageRoute(builder: (BuildContext context) {
       return PocaketBookPage();
     }));
   }
 
   void _toTodoPage() {
     Navigator.of(context)
-        .push(new MaterialPageRoute(builder: (BuildContext context) {
+        .push(new CupertinoPageRoute(builder: (BuildContext context) {
       return TodoPage();
     }));
   }
 
   void _toTimerPage() {
     Navigator.of(context)
-        .push(new MaterialPageRoute(builder: (BuildContext context) {
+        .push(new CupertinoPageRoute(builder: (BuildContext context) {
       return TimerPage();
     }));
   }
@@ -216,15 +217,22 @@ class MainPageState extends State<MainPage> {
 
   void _toThemePage() {
     Navigator.of(context)
-        .push(new MaterialPageRoute(builder: (BuildContext context) {
+        .push(new CupertinoPageRoute(builder: (BuildContext context) {
       return ThemePage();
     }));
   }
 
   void _toQuickStartPage() {
     Navigator.of(context)
-        .push(new MaterialPageRoute(builder: (BuildContext context) {
+        .push(new CupertinoPageRoute(builder: (BuildContext context) {
       return QuickStartPage();
+    }));
+  }
+
+  void _toSisterImagePage() {
+    Navigator.of(context)
+        .push(new CupertinoPageRoute(builder: (BuildContext context) {
+      return SisterImagePage();
     }));
   }
 
@@ -271,6 +279,13 @@ class MainPageState extends State<MainPage> {
               onTap: () {
                 Navigator.of(context).pop();
                 _toQuickStartPage();
+              }),
+          ListTile(
+              leading: Icon(Icons.pregnant_woman),
+              title: Text(Strings.sister_image),
+              onTap: () {
+                Navigator.of(context).pop();
+                _toSisterImagePage();
               }),
         ],
       ),

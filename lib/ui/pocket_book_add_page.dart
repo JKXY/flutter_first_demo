@@ -18,9 +18,11 @@ class PocketBookAddState extends State<PocketBookAddPage> {
   Widget build(BuildContext context) {
     if (currTimeStr == null)
       currTimeStr = ModalRoute.of(context).settings.arguments;
-    if(currTimeStr==null)
-      currTimeStr = "${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}";
+    if (currTimeStr == null)
+      currTimeStr =
+          "${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}";
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text(Strings.pcocketBookAdd),
         ),
@@ -32,7 +34,10 @@ class PocketBookAddState extends State<PocketBookAddPage> {
       children: <Widget>[
         Expanded(
             child: DecoratedBox(
-          decoration: BoxDecoration(color: Colors.grey[100]),
+          decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white10
+                  : Colors.grey[100]),
           position: DecorationPosition.background,
           child: _getTypeView(),
         )),
@@ -97,9 +102,10 @@ class PocketBookAddState extends State<PocketBookAddPage> {
             childAspectRatio: 1.0 //宽高比为1时，子widget
             ),
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Center(
+          return InkWell(
+            child: Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Icon(
                       _typeValue == 2
@@ -123,7 +129,9 @@ class PocketBookAddState extends State<PocketBookAddPage> {
 
   Color _typeColor(int index) {
     if (currentNameIndex == index)
-      return Theme.of(context).primaryColor;
+      return Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : Theme.of(context).primaryColor;
     else
       return Colors.blueGrey;
   }
@@ -226,19 +234,24 @@ class PocketBookAddState extends State<PocketBookAddPage> {
               ),
             ),
             Expanded(
-                child: Padding(
-              padding: EdgeInsets.all(8),
-              child: GestureDetector(
-                child: Text(
-                  remackStr.trim().length > 0 ? remackStr : Strings.remack_hint,
-                  textAlign: TextAlign.end,
-                  style: TextStyle(fontSize: 12),
-                ),
-                onTap: () async {
-                  remackStr = await _showRemackDialog();
-                  setState(() {});
-                },
-              ),
+                child: InkWell(
+              child: Container(
+                  height: 50,
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      remackStr != null && remackStr.trim().length > 0
+                          ? remackStr
+                          : Strings.remack_hint,
+                      textAlign: TextAlign.end,
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  )),
+              onTap: () async {
+                remackStr = await _showRemackDialog();
+                setState(() {});
+              },
             ))
           ],
         ),
@@ -302,7 +315,12 @@ class PocketBookAddState extends State<PocketBookAddPage> {
   Widget _getNumberRowView(int index) {
     if (index == 3) {
       //x
-      return Icon(Icons.backspace);
+      return GestureDetector(child: Icon(Icons.backspace),onLongPress: (){
+        setState(() {
+          _moneyValue = '0.0';
+          _isInput = false;
+        });
+      },);
     } else if (index == 15) {
       //保存
       if (isSaveing) {
