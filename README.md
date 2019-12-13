@@ -1,16 +1,18 @@
-# flutter_first_demo
+# Trainee
 
-A new Flutter application.
+My First Flutter Project
 
-## Getting Started
+## GIF
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+| ![](gif/home.gif) | ![](gif/bill.gif) | ![](gif/todo.gif) | ![](gif/timer.gif) |
+| --- | --- | --- | --- |
+| ![](gif/theme.gif) | ![](gif/quick_start.jpg) | ![](gif/sister_image.gif) |  |
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Data Source
+- Home : [https://wanandroid.com/](https://wanandroid.com/)
+- Sister Image : [http://gank.io/](http://gank.io/ ) 
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+
