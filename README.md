@@ -7,7 +7,7 @@ My First Flutter Project
 
 | ![](gif/home.gif) | ![](gif/bill.gif) | ![](gif/todo.gif) | ![](gif/timer.gif) |
 | --- | --- | --- | --- |
-| ![](gif/theme.gif) | ![](gif/quick_start.jpg) | ![](gif/sister_image.gif) |  |
+| ![](gif/theme.gif) | ![](gif/quick_start.gif) | ![](gif/sister_image.gif) |  |
 
 ## Data Source
 - Home : [https://wanandroid.com/](https://wanandroid.com/)
